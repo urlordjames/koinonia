@@ -1,0 +1,28 @@
+name: "build"
+
+on: ["push", "pull_request"]
+
+jobs:
+  build:
+    runs-on: "ubuntu-latest"
+    container: "alpine:latest"
+
+    steps:
+    - name: "dependancies"
+      run: "apk add --no-cache gcc g++ cmake ninja jsoncpp-dev zlib-dev util-linux-dev brotli-dev git"
+
+    - uses: "actions/checkout@v2"
+      with:
+        submodules: "recursive"
+
+    - name: "configure cmake"
+      run: "mkdir build && cd build && cmake --configure .. -GNinja -DCMAKE_BUILD_TYPE=Release"
+
+    - name: "build project"
+      run: "cmake --build . -j 2"
+      working-directory: "build"
+
+    - uses: "actions/upload-artifact@v2"
+      with:
+        name: "server"
+        path: "build/koinonia"
