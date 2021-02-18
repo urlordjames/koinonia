@@ -22,10 +22,10 @@ jobs:
       run: "cmake --build . -j 2"
       working-directory: "build"
 
-    - name: "copy static files" # should probably move this into CMakeLists.txt at some point
-      run: "cp static/* build/"
+    - name: "make release directory"
+      run: "mkdir release && cp build/koinonia release && cp build/static release -r"
 
     - uses: "actions/upload-artifact@v2"
       with:
         name: "server"
-        path: "build"
+        path: "release"
