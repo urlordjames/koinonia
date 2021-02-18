@@ -11,6 +11,7 @@ enum types{
 const std::unordered_map<std::string, types> typelookup = {{"sdp", sdp}, {"stream", stream}};
 
 void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::string&& message, const WebSocketMessageType& type) {
+  if (type != WebSocketMessageType::Text) return;
   try {
     std::unique_ptr<Json::Value> m = parseJSON(&message);
     std::string typestring = (*m)["type"].asString();

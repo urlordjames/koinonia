@@ -26,5 +26,6 @@ WORKDIR /koinonia
 EXPOSE 8080
 
 COPY --chown=koinonia:koinonia --from=builder /compile/build/koinonia /koinonia/koinonia
+COPY static /koinonia/
 
 CMD ["/koinonia/koinonia"]
