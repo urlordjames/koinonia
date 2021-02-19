@@ -1,14 +1,18 @@
 #include "StreamSock.h"
 #include "SocketInfo.h"
-#include <iostream>
 #include "Util.h"
 
 enum types{
   sdp,
-  stream
+  stream,
+  debug
 };
 
-const std::unordered_map<std::string, types> typelookup = {{"sdp", sdp}, {"stream", stream}};
+const std::unordered_map<std::string, types> typelookup = {
+  {"sdp", sdp},
+  {"stream", stream},
+  {"debug", debug}
+};
 
 void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::string&& message, const WebSocketMessageType& type) {
   if (type != WebSocketMessageType::Text) return;
@@ -17,10 +21,14 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
     std::string typestring = (*m)["type"].asString();
     try {
       const types type = typelookup.at(typestring);
+      auto info = wsConnPtr->getContext<SocketInfo>();
       switch (type) {
         case sdp:
-          wsConnPtr->send(debugMsg("your sdp is: " + (*m)["sdp"].asString()));
-        break;
+	  info->sdp = (*m)["sdp"].asString();
+          break;
+        case debug:
+          wsConnPtr->send(debugMsg("your sdp is: " + info->sdp));
+          break;
 	default:
 	  wsConnPtr->send(debugMsg("no server implementation for message type: " + typestring));
       }
@@ -34,6 +42,8 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 }
 
 void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketConnectionPtr& wsConnPtr) {
+  auto info = std::make_shared<SocketInfo>();
+  wsConnPtr->setContext(info);
   wsConnPtr->send(debugMsg("hello!"));
 }
 
