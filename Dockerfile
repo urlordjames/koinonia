@@ -9,6 +9,7 @@ WORKDIR /compile
 RUN git clone https://github.com/an-tao/drogon.git --recursive
 COPY CMakeLists.txt .
 COPY src src
+COPY static static
 
 RUN mkdir build
 WORKDIR /compile/build
@@ -26,6 +27,6 @@ WORKDIR /koinonia
 EXPOSE 8080
 
 COPY --chown=koinonia:koinonia --from=builder /compile/build/koinonia /koinonia/koinonia
-COPY static /koinonia/
+COPY --chown=koinonia:koinonia --from=builder /compile/build/static /koinonia/static
 
 CMD ["/koinonia/koinonia"]
