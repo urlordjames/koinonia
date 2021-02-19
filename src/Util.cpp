@@ -15,19 +15,19 @@ std::unique_ptr<Json::Value> parseJSON(std::string *str) {
   }
 }
 
-std::unique_ptr<std::string> stringify(Json::Value *v) {
+std::string stringify(Json::Value *v) {
   Json::StreamWriterBuilder builder;
-  return std::make_unique<std::string>(Json::writeString(builder, *v));
+  return std::string(Json::writeString(builder, *v));
 }
 
-std::unique_ptr<std::string> errorMsg(std::string message) {
+std::string errorMsg(std::string message) {
   Json::Value error;
   error["type"] = "error";
   error["message"] = message;
   return stringify(&error);
 }
 
-std::unique_ptr<std::string> debugMsg(std::string message) {
+std::string debugMsg(std::string message) {
   Json::Value debug;
   debug["type"] = "debug";
   debug["message"] = message;
