@@ -15,6 +15,10 @@ add_executable(${PROJECT_NAME}
   src/Util.cpp
 )
 
+if(CMAKE_COMPILER_IS_GNUCXX AND (CMAKE_BUILD_TYPE STREQUAL "Debug"))
+	target_compile_options(${PROJECT_NAME} PRIVATE "-Wall" "-Wextra")
+endif()
+
 target_link_libraries(${PROJECT_NAME} PRIVATE drogon)
 
 # copy static files
