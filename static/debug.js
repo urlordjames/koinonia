@@ -4,8 +4,11 @@ const div = document.getElementById("wslog");
 const text = document.getElementById("sockettext");
 const button = document.getElementById("sendbutton");
 
-ws.onopen = function() {
-	text.value = JSON.stringify({"type": "sdp", "sdp": "an example sdp"});
+let pc = new RTCPeerConnection();
+let offer = pc.createOffer();
+
+ws.onopen = async function() {
+	text.value = JSON.stringify({"type": "sdp", "sdp": await offer});
 	button.disabled = false;
 }
 

@@ -1,7 +1,7 @@
 #include <json/json.h>
 #include <memory>
 
-std::unique_ptr<Json::Value> parseJSON(std::string *str);
+Json::Value parseJSON(std::string *str);
 
 std::string stringify(Json::Value *v);
 

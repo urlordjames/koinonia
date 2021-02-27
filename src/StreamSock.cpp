@@ -14,30 +14,57 @@ const std::unordered_map<std::string, types> typelookup = {
 	{"debug", debug}
 };
 
+WebSocketConnectionPtr host;
+bool hasHost = false;
+
 void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::string&& message, const WebSocketMessageType& type) {
 	if (type != WebSocketMessageType::Text) return;
+
+	Json::Value m;
 	try {
-		std::unique_ptr<Json::Value> m = parseJSON(&message);
-		std::string typestring = (*m)["type"].asString();
-		try {
-			const types type = typelookup.at(typestring);
-			auto info = wsConnPtr->getContext<SocketInfo>();
-			switch (type) {
-				case sdp:
-					info->sdp = (*m)["sdp"].asString();
-					break;
-				case debug:
-					wsConnPtr->send(debugMsg("your sdp is: " + info->sdp));
-					break;
-				default:
-					wsConnPtr->send(debugMsg("no server implementation for message type: " + typestring));
-			}
-		} catch (std::out_of_range err) {
-			wsConnPtr->send(errorMsg("no such message type: " + typestring));
-		}
-	} catch (JSONCPP_STRING err) {
+		m = parseJSON(&message);
+	} catch (std::string err) {
 		wsConnPtr->send(errorMsg(err));
 		return;
+	}
+
+	std::string typestring;
+	try {
+		typestring = m["type"].asString();
+	} catch (Json::Exception err) {
+		wsConnPtr->send(errorMsg(err.what()));
+		return;
+	}
+
+	types msgtype;
+	try {
+		msgtype = typelookup.at(typestring);
+	} catch (std::out_of_range err) {
+		wsConnPtr->send(errorMsg("no such message type: " + typestring));
+		return;
+	}
+
+	auto info = wsConnPtr->getContext<SocketInfo>();
+	switch (msgtype) {
+		case sdp:
+			info->sdp = stringify(&m["sdp"]);
+			break;
+		case stream:
+			if (hasHost) {
+				wsConnPtr->send(debugMsg("already host"));
+			}
+			else {
+				host = wsConnPtr;
+				info->host = true;
+				hasHost = true;
+				wsConnPtr->send(debugMsg("OK"));
+			}
+			break;
+		case debug:
+			wsConnPtr->send(debugMsg("your sdp is: " + info->sdp));
+			break;
+		default:
+			wsConnPtr->send(debugMsg("no server implementation for message type: " + typestring));
 	}
 }
 
@@ -48,5 +75,9 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 }
 
 void StreamSock::handleConnectionClosed(const WebSocketConnectionPtr& wsConnPtr) {
-	// stuff
+	auto info = wsConnPtr->getContext<SocketInfo>();
+	if (info->host) {
+		hasHost = false;
+		host = NULL;
+	}
 }
