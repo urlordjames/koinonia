@@ -54,8 +54,9 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 				Json::Value to_send(Json::arrayValue);
 				for (auto i = participants.begin(); i != participants.end(); i++) {
 					auto participant = (*i)->getContext<SocketInfo>();
-					to_send.append(participant->sdp);
-					//wsConnPtr->send(debugMsg(participant->sdp));
+					if (*i != wsConnPtr) {
+						to_send.append(participant->sdp);
+					}
 				}
 				wsConnPtr->send(debugMsg(stringify(&to_send)));
 			}
