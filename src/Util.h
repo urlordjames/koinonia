@@ -9,3 +9,4 @@ std::string stringify(Json::Value *v);
 std::string errorMsg(std::string message);
 std::string debugMsg(std::string message);
 std::string syncMsg(Json::Value *peers);
+std::string answerMsg(Json::Value *answer);

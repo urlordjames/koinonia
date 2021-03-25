@@ -39,3 +39,10 @@ std::string syncMsg(Json::Value *peers) {
 	sync["peers"] = *peers;
 	return stringify(&sync);
 }
+
+std::string answerMsg(Json::Value *answer) {
+	Json::Value msg;
+	msg["type"] = "answer";
+	msg["message"] = *answer;
+	return stringify(&msg);
+}

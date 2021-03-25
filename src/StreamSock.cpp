@@ -71,7 +71,7 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 			for (auto i = participants.begin(); i != participants.end(); i++) {
 				auto p = (*i)->getContext<SocketInfo>();
 				if (p->uuid == m["uuid"].asString()) {
-					(*i)->send(debugMsg(m["message"].asString()));
+					(*i)->send(answerMsg(&m["message"]));
 					return;
 				}
 			}
