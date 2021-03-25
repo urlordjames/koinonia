@@ -32,3 +32,10 @@ std::string debugMsg(std::string message) {
 	debug["message"] = message;
 	return stringify(&debug);
 }
+
+std::string syncMsg(Json::Value *peers) {
+	Json::Value sync;
+	sync["type"] = "sync";
+	sync["peers"] = *peers;
+	return stringify(&sync);
+}

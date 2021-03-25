@@ -8,8 +8,10 @@ let pc = new RTCPeerConnection();
 let offer = pc.createOffer();
 
 ws.onopen = async function() {
-	text.value = JSON.stringify({"type": "join", "sdp": await offer});
+	sendMsg(JSON.stringify({"type": "join", "sdp": await offer}));
+	text.value = JSON.stringify({"type": "sync"});
 	button.disabled = false;
+	await pc.setLocalDescription(await offer);
 }
 
 ws.onclose = function() {
@@ -21,11 +23,16 @@ ws.onclose = function() {
 	div.appendChild(newdiv);
 }
 
-ws.onmessage = function(msg) {
+ws.onmessage = async function(msg) {
 	let newdiv = document.createElement("div");
 	newdiv.setAttribute("side", "server");
-	newdiv.innerHTML = msg.data
+	newdiv.innerHTML = msg.data;
 	div.appendChild(newdiv);
+	const data = JSON.parse(msg.data);
+	if (data["type"] == "sync") {
+		console.log(data["peers"][0]["sdp"]);
+		await pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(data["peers"][0]["sdp"])));
+	}
 }
 
 button.addEventListener("click", onClick);

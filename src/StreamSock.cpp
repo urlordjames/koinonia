@@ -5,12 +5,14 @@
 enum types{
 	join,
 	sync,
+	answer,
 	debug
 };
 
 const std::unordered_map<std::string, types> typelookup = {
 	{"join", join},
 	{"sync", sync},
+	{"answer", answer},
 	{"debug", debug}
 };
 
@@ -55,11 +57,25 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 				for (auto i = participants.begin(); i != participants.end(); i++) {
 					auto participant = (*i)->getContext<SocketInfo>();
 					if (*i != wsConnPtr) {
-						to_send.append(participant->sdp);
+						Json::Value part_json;
+						part_json["sdp"] = participant->sdp;
+						part_json["uuid"] = participant->uuid;
+						to_send.append(part_json);
 					}
 				}
-				wsConnPtr->send(debugMsg(stringify(&to_send)));
+				wsConnPtr->send(syncMsg(&to_send));
 			}
+			break;
+		case answer:
+			// optimize later (maybe using std::unordered_map)
+			for (auto i = participants.begin(); i != participants.end(); i++) {
+				auto p = (*i)->getContext<SocketInfo>();
+				if (p->uuid == m["uuid"].asString()) {
+					(*i)->send(debugMsg(m["message"].asString()));
+					return;
+				}
+			}
+			wsConnPtr->send(errorMsg("no such uuid"));
 			break;
 		case debug:
 			wsConnPtr->send(debugMsg("your sdp is: " + info->sdp));
@@ -71,6 +87,7 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 
 void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketConnectionPtr& wsConnPtr) {
 	auto info = std::make_shared<SocketInfo>();
+	info->uuid = drogon::utils::getUuid();
 	wsConnPtr->setContext(info);
 	wsConnPtr->send(debugMsg("hello!"));
 }
