@@ -3,19 +3,18 @@
 #include "Util.h"
 
 enum types{
-	sdp,
-	stream,
+	join,
+	sync,
 	debug
 };
 
 const std::unordered_map<std::string, types> typelookup = {
-	{"sdp", sdp},
-	{"stream", stream},
+	{"join", join},
+	{"sync", sync},
 	{"debug", debug}
 };
 
-WebSocketConnectionPtr host;
-bool hasHost = false;
+std::unordered_set<WebSocketConnectionPtr> participants;
 
 void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::string&& message, const WebSocketMessageType& type) {
 	if (type != WebSocketMessageType::Text) return;
@@ -46,18 +45,19 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 
 	auto info = wsConnPtr->getContext<SocketInfo>();
 	switch (msgtype) {
-		case sdp:
+		case join:
 			info->sdp = stringify(&m["sdp"]);
+			participants.insert(wsConnPtr);
 			break;
-		case stream:
-			if (hasHost) {
-				wsConnPtr->send(debugMsg("already host"));
-			}
-			else {
-				host = wsConnPtr;
-				info->host = true;
-				hasHost = true;
-				wsConnPtr->send(debugMsg("OK"));
+		case sync:
+			{
+				Json::Value to_send(Json::arrayValue);
+				for (auto i = participants.begin(); i != participants.end(); i++) {
+					auto participant = (*i)->getContext<SocketInfo>();
+					to_send.append(participant->sdp);
+					//wsConnPtr->send(debugMsg(participant->sdp));
+				}
+				wsConnPtr->send(debugMsg(stringify(&to_send)));
 			}
 			break;
 		case debug:
@@ -75,9 +75,5 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 }
 
 void StreamSock::handleConnectionClosed(const WebSocketConnectionPtr& wsConnPtr) {
-	auto info = wsConnPtr->getContext<SocketInfo>();
-	if (info->host) {
-		hasHost = false;
-		host = NULL;
-	}
+	participants.erase(wsConnPtr);
 }

@@ -8,7 +8,7 @@ let pc = new RTCPeerConnection();
 let offer = pc.createOffer();
 
 ws.onopen = async function() {
-	text.value = JSON.stringify({"type": "sdp", "sdp": await offer});
+	text.value = JSON.stringify({"type": "join", "sdp": await offer});
 	button.disabled = false;
 }
 

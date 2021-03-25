@@ -16,7 +16,7 @@ Json::Value parseJSON(std::string *str) {
 
 std::string stringify(Json::Value *v) {
 	Json::StreamWriterBuilder builder;
-	return std::string(Json::writeString(builder, *v));
+	return Json::writeString(builder, *v);
 }
 
 std::string errorMsg(std::string message) {
