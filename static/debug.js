@@ -9,9 +9,9 @@ let offer = pc.createOffer();
 
 ws.onopen = async function() {
 	sendMsg(JSON.stringify({"type": "join", "sdp": await offer}));
-	text.value = JSON.stringify({"type": "sync"});
+	sendMsg(JSON.stringify({"type": "sync"}));
 	button.disabled = false;
-	await pc.setLocalDescription(await offer);
+	pc.setLocalDescription(await offer);
 }
 
 ws.onclose = function() {
@@ -30,8 +30,15 @@ ws.onmessage = async function(msg) {
 	div.appendChild(newdiv);
 	const data = JSON.parse(msg.data);
 	if (data["type"] == "sync") {
-		console.log(data["peers"][0]["sdp"]);
-		await pc.setRemoteDescription(new RTCSessionDescription(JSON.parse(data["peers"][0]["sdp"])));
+		if (data["peers"][0]) {
+			let peer = data["peers"][0];
+			let desc = new RTCSessionDescription(JSON.parse(peer["sdp"]));
+			await pc.setRemoteDescription(desc);
+			let ans = pc.createAnswer();
+			pc.setLocalDescription(await ans);
+			console.log(JSON.stringify(await ans));
+			text.value = JSON.stringify({"type": "answer", "uuid": peer["uuid"], "message": await ans});
+		}
 	}
 }
 
