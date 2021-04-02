@@ -19,7 +19,7 @@ jobs:
       run: "mkdir build && cd build && cmake --configure .. -GNinja -DCMAKE_BUILD_TYPE=Debug"
 
     - name: "build project"
-      run: "cmake --build . -j 2"
+      run: "cmake --build . -j $(nproc)"
       working-directory: "build"
 
     - name: "make release directory"
