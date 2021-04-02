@@ -4,7 +4,12 @@ const div = document.getElementById("wslog");
 const text = document.getElementById("sockettext");
 const button = document.getElementById("sendbutton");
 
-let pc = new RTCPeerConnection();
+let pc = new RTCPeerConnection({
+	"iceServers": [{
+		urls: ["stun:stun.l.google.com:19302"]
+	}]
+});
+let dc = pc.createDataChannel("test");
 let offer = pc.createOffer();
 
 ws.onopen = async function() {
@@ -33,13 +38,20 @@ ws.onmessage = async function(msg) {
 		if (data["peers"][0]) {
 			let peer = data["peers"][0];
 			let desc = new RTCSessionDescription(JSON.parse(peer["sdp"]));
-			await pc.setRemoteDescription(desc);
+			pc.setRemoteDescription(desc);
 			let ans = pc.createAnswer();
 			pc.setLocalDescription(await ans);
-			console.log(JSON.stringify(await ans));
 			text.value = JSON.stringify({"type": "answer", "uuid": peer["uuid"], "message": await ans});
 		}
+	} else if (data["type"] == "answer") {
+		let msg = data["message"];
+		let desc = new RTCSessionDescription(msg);
+		pc.setRemoteDescription(desc);
 	}
+}
+
+pc.ondatachannel = function(c) {
+	console.log(c);
 }
 
 button.addEventListener("click", onClick);
