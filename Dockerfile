@@ -6,7 +6,7 @@ RUN adduser koinonia -H -D && mkdir /compile && chown koinonia:koinonia /compile
 USER koinonia
 WORKDIR /compile
 
-RUN git clone https://github.com/an-tao/drogon.git --recursive
+COPY --chown=koinonia:koinonia drogon drogon
 COPY CMakeLists.txt .
 COPY src src
 COPY static static
@@ -14,7 +14,7 @@ COPY static static
 RUN mkdir build
 WORKDIR /compile/build
 
-RUN cmake --configure .. -GNinja -DCMAKE_BUILD_TYPE=Release && cmake --build . -j 12
+RUN cmake --configure .. -GNinja -DCMAKE_BUILD_TYPE=Release && cmake --build . -j $(nproc)
 
 FROM alpine:latest
 
