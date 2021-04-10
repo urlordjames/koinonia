@@ -54,9 +54,9 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 		case sync:
 			{
 				Json::Value to_send(Json::arrayValue);
-				for (auto i = participants.begin(); i != participants.end(); i++) {
-					auto participant = (*i)->getContext<SocketInfo>();
-					if (*i != wsConnPtr) {
+				for (auto i : participants) {
+					auto participant = i->getContext<SocketInfo>();
+					if (i != wsConnPtr) {
 						Json::Value part_json;
 						part_json["sdp"] = participant->sdp;
 						part_json["uuid"] = participant->uuid;
@@ -67,11 +67,11 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 			}
 			break;
 		case answer:
-			// optimize later (maybe using std::unordered_map)
-			for (auto i = participants.begin(); i != participants.end(); i++) {
-				auto p = (*i)->getContext<SocketInfo>();
+			// TODO: maybe use std::map instead
+			for (auto i : participants) {
+				auto p = i->getContext<SocketInfo>();
 				if (p->uuid == m["uuid"].asString()) {
-					(*i)->send(answerMsg(&m["message"]));
+					i->send(answerMsg(&m["message"]));
 					return;
 				}
 			}
