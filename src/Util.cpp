@@ -5,7 +5,7 @@ Json::Value parseJSON(std::string *str) {
 	Json::CharReaderBuilder builder;
 	Json::CharReader *reader = builder.newCharReader();
 	JSONCPP_STRING err;
-	bool success = reader->parse(str->c_str(), str->c_str() + (str->length() * sizeof(char)), &value, &err);
+	bool success = reader->parse(str->c_str(), str->c_str() + str->length(), &value, &err);
 	delete reader;
 	if (success) {
 		return value;
