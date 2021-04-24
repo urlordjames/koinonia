@@ -2,18 +2,18 @@
 #include "SocketInfo.h"
 #include "Util.h"
 
-enum types{
+enum class msgType {
 	join,
 	sync,
 	answer,
 	debug
 };
 
-const std::unordered_map<std::string, types> typelookup = {
-	{"join", join},
-	{"sync", sync},
-	{"answer", answer},
-	{"debug", debug}
+const std::unordered_map<std::string, msgType> typelookup = {
+	{"join", msgType::join},
+	{"sync", msgType::sync},
+	{"answer", msgType::answer},
+	{"debug", msgType::debug}
 };
 
 std::unordered_set<WebSocketConnectionPtr> participants;
@@ -37,7 +37,7 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 		return;
 	}
 
-	types msgtype;
+	msgType msgtype;
 	try {
 		msgtype = typelookup.at(typestring);
 	} catch (std::out_of_range err) {
@@ -47,11 +47,11 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 
 	auto info = wsConnPtr->getContext<SocketInfo>();
 	switch (msgtype) {
-		case join:
+		case msgType::join:
 			info->sdp = stringify(&m["sdp"]);
 			participants.insert(wsConnPtr);
 			break;
-		case sync:
+		case msgType::sync:
 			{
 				Json::Value to_send(Json::arrayValue);
 				for (auto i : participants) {
@@ -66,7 +66,7 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 				wsConnPtr->send(syncMsg(&to_send));
 			}
 			break;
-		case answer:
+		case msgType::answer:
 			// TODO: maybe use std::map instead
 			for (auto i : participants) {
 				auto p = i->getContext<SocketInfo>();
@@ -77,7 +77,7 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 			}
 			wsConnPtr->send(errorMsg("no such uuid"));
 			break;
-		case debug:
+		case msgType::debug:
 			wsConnPtr->send(debugMsg("your sdp is: " + info->sdp));
 			break;
 		default:
