@@ -17,6 +17,7 @@ const std::unordered_map<std::string, msgType> typelookup = {
 };
 
 std::unordered_set<WebSocketConnectionPtr> participants;
+std::mutex participants_mutex;
 
 void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::string&& message, const WebSocketMessageType& type) {
 	if (type != WebSocketMessageType::Text) return;
@@ -49,11 +50,18 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 	switch (msgtype) {
 		case msgType::join:
 			info->sdp = stringify(&m["sdp"]);
+
+			participants_mutex.lock();
 			participants.insert(wsConnPtr);
+			participants_mutex.unlock();
+
 			break;
 		case msgType::sync:
 			{
 				Json::Value to_send(Json::arrayValue);
+
+				participants_mutex.lock();
+
 				for (auto i : participants) {
 					auto participant = i->getContext<SocketInfo>();
 					if (i != wsConnPtr) {
@@ -63,18 +71,27 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 						to_send.append(part_json);
 					}
 				}
+
+				participants_mutex.unlock();
+
 				wsConnPtr->send(syncMsg(&to_send));
 			}
 			break;
 		case msgType::answer:
 			// TODO: maybe use std::map instead
+			participants_mutex.lock();
+
 			for (auto i : participants) {
 				auto p = i->getContext<SocketInfo>();
 				if (p->uuid == m["uuid"].asString()) {
 					i->send(answerMsg(&m["message"]));
+					participants_mutex.unlock();
 					return;
 				}
 			}
+
+			participants_mutex.unlock();
+
 			wsConnPtr->send(errorMsg("no such uuid"));
 			break;
 		case msgType::debug:
@@ -93,5 +110,7 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 }
 
 void StreamSock::handleConnectionClosed(const WebSocketConnectionPtr& wsConnPtr) {
+	participants_mutex.lock();
 	participants.erase(wsConnPtr);
+	participants_mutex.unlock();
 }
