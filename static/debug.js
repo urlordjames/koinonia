@@ -41,7 +41,10 @@ ws.onmessage = async function(msg) {
 			pc.setRemoteDescription(desc);
 			let ans = pc.createAnswer();
 			pc.setLocalDescription(await ans);
-			text.value = JSON.stringify({"type": "answer", "uuid": peer["uuid"], "message": await ans});
+			// uhh, this is an oversight, in the final version there can't be a global peer connection variable
+			// it will probably need to be created in response to a sync message
+			peer_uuid = peer["uuid"];
+			text.value = JSON.stringify({"type": "answer", "uuid": peer_uuid, "message": await ans});
 		}
 	} else if (data["type"] == "answer") {
 		let msg = data["message"];
@@ -52,6 +55,11 @@ ws.onmessage = async function(msg) {
 
 pc.ondatachannel = function(c) {
 	console.log(c);
+}
+
+pc.onicecandidate = function(e) {
+	if (e.candidate == null) return;
+	sendMsg(JSON.stringify({"type": "ice", "uuid": peer_uuid, "candidate": JSON.stringify(e.candidate)}));
 }
 
 button.addEventListener("click", onClick);

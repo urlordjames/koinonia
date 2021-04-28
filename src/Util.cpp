@@ -46,3 +46,11 @@ std::string answerMsg(Json::Value *answer) {
 	msg["message"] = *answer;
 	return stringify(&msg);
 }
+
+std::string iceMsg(std::string uuid, std::string candidate) {
+	Json::Value msg;
+	msg["type"] = "ice";
+	msg["uuid"] = uuid;
+	msg["candidate"] = candidate;
+	return stringify(&msg);
+}

@@ -10,3 +10,4 @@ std::string errorMsg(std::string message);
 std::string debugMsg(std::string message);
 std::string syncMsg(Json::Value *peers);
 std::string answerMsg(Json::Value *answer);
+std::string iceMsg(std::string uuid, std::string candidate);

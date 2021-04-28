@@ -6,6 +6,7 @@ enum class msgType {
 	join,
 	sync,
 	answer,
+	ice,
 	debug
 };
 
@@ -13,6 +14,7 @@ const std::unordered_map<std::string, msgType> typelookup = {
 	{"join", msgType::join},
 	{"sync", msgType::sync},
 	{"answer", msgType::answer},
+	{"ice", msgType::ice},
 	{"debug", msgType::debug}
 };
 
@@ -93,6 +95,20 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 			participants_mutex.unlock();
 
 			wsConnPtr->send(errorMsg("no such uuid"));
+			break;
+		case msgType::ice:
+			participants_mutex.lock();
+
+			for (auto i : participants) {
+				auto p = i->getContext<SocketInfo>();
+				if (p->uuid == m["uuid"].asString()) {
+					i->send(iceMsg(info->sdp, m["candidate"].asString()));
+					participants_mutex.unlock();
+					return;
+				}
+			}
+
+			participants_mutex.unlock();
 			break;
 		case msgType::debug:
 			wsConnPtr->send(debugMsg("your sdp is: " + info->sdp));
