@@ -50,6 +50,9 @@ ws.onmessage = async function(msg) {
 		let msg = data["message"];
 		let desc = new RTCSessionDescription(msg);
 		pc.setRemoteDescription(desc);
+	} else if (data["type"] == "ice") {
+		const candidate = data["candidate"];
+		pc.addIceCandidate(candidate);
 	}
 }
 
