@@ -3,6 +3,7 @@
 #include "Util.h"
 
 enum class msgType {
+	uuid,
 	sync,
 	offer,
 	answer,
@@ -10,6 +11,7 @@ enum class msgType {
 };
 
 const std::unordered_map<std::string, msgType> typelookup = {
+	{"uuid", msgType::uuid},
 	{"sync", msgType::sync},
 	{"offer", msgType::offer},
 	{"answer", msgType::answer},
@@ -48,6 +50,9 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 
 	auto info = wsConnPtr->getContext<SocketInfo>();
 	switch (msgtype) {
+		case msgType::uuid:
+			wsConnPtr->send(uuidMsg(info->uuid));
+			break;
 		case msgType::sync:
 			{
 				Json::Value to_send(Json::arrayValue);

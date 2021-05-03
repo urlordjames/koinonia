@@ -3,9 +3,30 @@ const ws = new WebSocket("ws://" + url.hostname + ":" + url.port + "/stream");
 const join_button = document.getElementById("join_button");
 const participant_div = document.getElementById("participant_div");
 
+let participants = {}
+let uuid;
+
 ws.onopen = async function() {
-	join_button.disabled = false;
-	join_button.addEventListener("click", function(e) {
-		console.log("test");
-	});
+	ws.send(JSON.stringify({"type": "uuid"}));
+}
+
+ws.onmessage = async function(e) {
+	const msg = JSON.parse(e.data);
+	if (msg["type"] == "uuid") {
+		uuid = msg.uuid;
+		join_button.disabled = false;
+		join_button.addEventListener("click", function(e) {
+			ws.send(JSON.stringify({"type": "sync"}));
+			join_button.remove();
+			delete join_button;
+		});
+	} else if (msg["type"] == "sync") {
+		for (peer of msg.peers) {
+			if (participants[peer.uuid] == null) {
+				participants[peer.uuid] = {
+					"pc": new RTCPeerConnection()
+				};
+			}
+		}
+	}
 }

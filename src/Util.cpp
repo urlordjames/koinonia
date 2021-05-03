@@ -14,44 +14,51 @@ Json::Value parseJSON(std::string *str) {
 	}
 }
 
-std::string stringify(Json::Value *v) {
+std::string stringify(Json::Value &v) {
 	Json::StreamWriterBuilder builder;
-	return Json::writeString(builder, *v);
+	return Json::writeString(builder, v);
 }
 
 std::string errorMsg(std::string message) {
 	Json::Value error;
 	error["type"] = "error";
 	error["message"] = message;
-	return stringify(&error);
+	return stringify(error);
 }
 
 std::string debugMsg(std::string message) {
 	Json::Value debug;
 	debug["type"] = "debug";
 	debug["message"] = message;
-	return stringify(&debug);
+	return stringify(debug);
+}
+
+std::string uuidMsg(std::string &uuid) {
+	Json::Value msg;
+	msg["type"] = "uuid";
+	msg["uuid"] = uuid;
+	return stringify(msg);
 }
 
 std::string syncMsg(Json::Value &peers) {
 	Json::Value sync;
 	sync["type"] = "sync";
 	sync["peers"] = peers;
-	return stringify(&sync);
+	return stringify(sync);
 }
 
 std::string offerMsg(Json::Value &offer) {
 	Json::Value msg;
 	msg["type"] = "offer";
 	msg["offer"] = offer;
-	return stringify(&msg);
+	return stringify(msg);
 }
 
 std::string answerMsg(Json::Value &answer) {
 	Json::Value msg;
 	msg["type"] = "answer";
 	msg["answer"] = answer;
-	return stringify(&msg);
+	return stringify(msg);
 }
 
 std::string iceMsg(std::string uuid, std::string candidate) {
@@ -59,5 +66,5 @@ std::string iceMsg(std::string uuid, std::string candidate) {
 	msg["type"] = "ice";
 	msg["uuid"] = uuid;
 	msg["candidate"] = candidate;
-	return stringify(&msg);
+	return stringify(msg);
 }
