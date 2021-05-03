@@ -1,3 +1,5 @@
+// this may not even be useful anymore because the server has changed so much...
+
 const url = new URL(window.location.href);
 const ws = new WebSocket("ws://" + url.hostname + ":" + url.port + "/stream");
 const div = document.getElementById("wslog");

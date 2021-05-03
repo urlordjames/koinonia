@@ -3,19 +3,15 @@
 #include "Util.h"
 
 enum class msgType {
-	join,
 	sync,
 	answer,
 	ice,
-	debug
 };
 
 const std::unordered_map<std::string, msgType> typelookup = {
-	{"join", msgType::join},
 	{"sync", msgType::sync},
 	{"answer", msgType::answer},
 	{"ice", msgType::ice},
-	{"debug", msgType::debug}
 };
 
 std::unordered_set<WebSocketConnectionPtr> participants;
@@ -50,14 +46,6 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 
 	auto info = wsConnPtr->getContext<SocketInfo>();
 	switch (msgtype) {
-		case msgType::join:
-			info->sdp = stringify(&m["sdp"]);
-
-			participants_mutex.lock();
-			participants.insert(wsConnPtr);
-			participants_mutex.unlock();
-
-			break;
 		case msgType::sync:
 			{
 				Json::Value to_send(Json::arrayValue);
@@ -67,8 +55,8 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 				for (auto i : participants) {
 					auto participant = i->getContext<SocketInfo>();
 					if (i != wsConnPtr) {
+						// this is a json object because I may want to attach additional information in the future like a username
 						Json::Value part_json;
-						part_json["sdp"] = participant->sdp;
 						part_json["uuid"] = participant->uuid;
 						to_send.append(part_json);
 					}
@@ -102,16 +90,13 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 			for (auto i : participants) {
 				auto p = i->getContext<SocketInfo>();
 				if (p->uuid == m["uuid"].asString()) {
-					i->send(iceMsg(info->sdp, m["candidate"].asString()));
+					i->send(iceMsg(info->uuid, m["candidate"].asString()));
 					participants_mutex.unlock();
 					return;
 				}
 			}
 
 			participants_mutex.unlock();
-			break;
-		case msgType::debug:
-			wsConnPtr->send(debugMsg("your sdp is: " + info->sdp));
 			break;
 		default:
 			wsConnPtr->send(debugMsg("no server implementation for message type: " + typestring));
@@ -122,6 +107,11 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 	auto info = std::make_shared<SocketInfo>();
 	info->uuid = drogon::utils::getUuid();
 	wsConnPtr->setContext(info);
+
+	participants_mutex.lock();
+	participants.insert(wsConnPtr);
+	participants_mutex.unlock();
+
 	wsConnPtr->send(debugMsg("hello!"));
 }
 

@@ -1,6 +1,5 @@
 class SocketInfo {
-// a mutex may be required here at some point
+// this should probably be private later with setter/getter methods that lock/unlock a mutex, but for now this is probably fine (tm)
 public:
-	std::string sdp = "";
 	std::string uuid = "";
 };
