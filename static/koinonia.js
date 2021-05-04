@@ -32,6 +32,7 @@ ws.onmessage = async function(e) {
 				};
 
 				if (rude) {
+					pc.createDataChannel("test");
 					const offer = await pc.createOffer()
 
 					pc.setLocalDescription(offer);
@@ -41,6 +42,10 @@ ws.onmessage = async function(e) {
 						"uuid": peer.uuid,
 						"offer": offer
 					}));
+				}
+
+				pc.ondatachannel = function(c) {
+					console.log(c);
 				}
 			}
 		}
