@@ -81,7 +81,7 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 			for (auto i : participants) {
 				auto p = i->getContext<SocketInfo>();
 				if (p->uuid == m["uuid"].asString()) {
-					i->send(offerMsg(m["offer"]));
+					i->send(offerMsg(info->uuid, m["offer"]));
 					participants_mutex.unlock();
 					return;
 				}
@@ -97,7 +97,7 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 			for (auto i : participants) {
 				auto p = i->getContext<SocketInfo>();
 				if (p->uuid == m["uuid"].asString()) {
-					i->send(answerMsg(m["answer"]));
+					i->send(answerMsg(info->uuid, m["answer"]));
 					participants_mutex.unlock();
 					return;
 				}

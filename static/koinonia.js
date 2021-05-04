@@ -49,7 +49,17 @@ ws.onmessage = async function(e) {
 		const desc = new RTCSessionDescription(msg["offer"]);
 		pc.setRemoteDescription(desc);
 
-		const ans = pc.createAnswer();
-		console.log(ans);
+		const ans = await pc.createAnswer();
+		pc.setLocalDescription(ans);
+
+		ws.send(JSON.stringify({
+			"type": "answer",
+			"uuid": msg["uuid"],
+			"answer": ans
+		}));
+	} else if (msg["type"] == "answer") {
+		const pc = participants[msg["uuid"]]["pc"];
+		const desc = new RTCSessionDescription(msg["answer"]);
+		pc.setRemoteDescription(desc);
 	}
 }

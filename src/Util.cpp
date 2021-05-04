@@ -47,16 +47,18 @@ std::string syncMsg(Json::Value &peers) {
 	return stringify(sync);
 }
 
-std::string offerMsg(Json::Value &offer) {
+std::string offerMsg(std::string &uuid, Json::Value &offer) {
 	Json::Value msg;
 	msg["type"] = "offer";
+	msg["uuid"] = uuid;
 	msg["offer"] = offer;
 	return stringify(msg);
 }
 
-std::string answerMsg(Json::Value &answer) {
+std::string answerMsg(std::string &uuid, Json::Value &answer) {
 	Json::Value msg;
 	msg["type"] = "answer";
+	msg["uuid"] = uuid;
 	msg["answer"] = answer;
 	return stringify(msg);
 }
