@@ -1,10 +1,26 @@
 const url = new URL(window.location.href);
 const ws = new WebSocket("ws://" + url.hostname + ":" + url.port + "/stream");
+const permissions_button = document.getElementById("permissions_button");
 const join_button = document.getElementById("join_button");
 const participant_div = document.getElementById("participant_div");
 
 let participants = {}
 let uuid;
+
+permissions_button.addEventListener("click", async function(e) {
+	const localStream = await navigator.mediaDevices.getDisplayMedia({
+		"video": true,
+		"audio": false
+	});
+
+	for (participant of Object.values(participants)) {
+		const pc = participant["pc"];
+
+		for (track of localStream.getTracks()) {
+			pc.addTrack(track, localStream);
+		}
+	}
+});
 
 ws.onopen = async function() {
 	ws.send(JSON.stringify({"type": "uuid"}));
@@ -43,18 +59,20 @@ ws.onmessage = async function(e) {
 			const part = get_participant(peer.uuid);
 			const pc = part["pc"];
 
-			pc.createDataChannel("test");
-
 			if (part["rude"]) {
-				const offer = await pc.createOffer()
+				pc.onnegotiationneeded = async function() {
+					const offer = await pc.createOffer()
 
-				pc.setLocalDescription(offer);
+					pc.setLocalDescription(offer);
 
-				ws.send(JSON.stringify({
-					"type": "offer",
-					"uuid": peer.uuid,
-					"offer": offer
-				}));
+					ws.send(JSON.stringify({
+						"type": "offer",
+						"uuid": peer.uuid,
+						"offer": offer
+					}));
+				}
+
+				pc.onnegotiationneeded();
 			}
 
 			pc.onicecandidate = function(e) {
@@ -67,8 +85,17 @@ ws.onmessage = async function(e) {
 				}
 			}
 
-			pc.ondatachannel = function(c) {
-				console.log(c);
+			pc.ontrack = function(e) {
+				const video = document.createElement("video");
+				const remoteStream = new MediaStream();
+
+				for (track of e.streams[0].getTracks()) {
+					remoteStream.addTrack(track);
+				}
+
+				video.srcObject = remoteStream;
+				participant_div.appendChild(video);
+				video.play();
 			}
 		}
 	} else if (msg["type"] == "offer") {
