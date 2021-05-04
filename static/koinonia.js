@@ -23,10 +23,33 @@ ws.onmessage = async function(e) {
 	} else if (msg["type"] == "sync") {
 		for (peer of msg.peers) {
 			if (participants[peer.uuid] == null) {
+				const pc = new RTCPeerConnection();
+				const rude = peer.uuid < uuid;
+
 				participants[peer.uuid] = {
-					"pc": new RTCPeerConnection()
+					"pc": pc,
+					"rude": rude 
 				};
+
+				if (rude) {
+					const offer = await pc.createOffer()
+
+					pc.setLocalDescription(offer);
+
+					ws.send(JSON.stringify({
+						"type": "offer",
+						"uuid": peer.uuid,
+						"offer": offer
+					}));
+				}
 			}
 		}
+	} else if (msg["type"] == "offer") {
+		const pc = participants[msg["uuid"]]["pc"];
+		const desc = new RTCSessionDescription(msg["offer"]);
+		pc.setRemoteDescription(desc);
+
+		const ans = pc.createAnswer();
+		console.log(ans);
 	}
 }
