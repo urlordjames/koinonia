@@ -63,7 +63,7 @@ std::string answerMsg(std::string &uuid, Json::Value &answer) {
 	return stringify(msg);
 }
 
-std::string iceMsg(std::string uuid, std::string candidate) {
+std::string iceMsg(std::string &uuid, Json::Value &candidate) {
 	Json::Value msg;
 	msg["type"] = "ice";
 	msg["uuid"] = uuid;

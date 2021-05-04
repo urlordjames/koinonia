@@ -113,7 +113,7 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 			for (auto i : participants) {
 				auto p = i->getContext<SocketInfo>();
 				if (p->uuid == m["uuid"].asString()) {
-					i->send(iceMsg(info->uuid, m["candidate"].asString()));
+					i->send(iceMsg(info->uuid, m["candidate"]));
 					participants_mutex.unlock();
 					return;
 				}

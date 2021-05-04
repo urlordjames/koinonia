@@ -31,8 +31,9 @@ ws.onmessage = async function(e) {
 					"rude": rude 
 				};
 
+				pc.createDataChannel("test");
+
 				if (rude) {
-					pc.createDataChannel("test");
 					const offer = await pc.createOffer()
 
 					pc.setLocalDescription(offer);
@@ -44,12 +45,32 @@ ws.onmessage = async function(e) {
 					}));
 				}
 
+				pc.onicecandidate = function(e) {
+					if (e.candidate) {
+						ws.send(JSON.stringify({
+							"type": "ice",
+							"uuid": peer.uuid,
+							"candidate": e.candidate
+						}));
+					}
+				}
+
 				pc.ondatachannel = function(c) {
 					console.log(c);
 				}
 			}
 		}
 	} else if (msg["type"] == "offer") {
+		if (!participants[msg["uuid"]]) {
+			const pc = new RTCPeerConnection();
+			const rude = peer.uuid < uuid;
+
+			participants[peer.uuid] = {
+				"pc": pc,
+				"rude": rude 
+			};
+		}
+
 		const pc = participants[msg["uuid"]]["pc"];
 		const desc = new RTCSessionDescription(msg["offer"]);
 		pc.setRemoteDescription(desc);
@@ -66,5 +87,8 @@ ws.onmessage = async function(e) {
 		const pc = participants[msg["uuid"]]["pc"];
 		const desc = new RTCSessionDescription(msg["answer"]);
 		pc.setRemoteDescription(desc);
+	} else if (msg["type"] == "ice") {
+		const pc = participants[msg["uuid"]]["pc"];
+		pc.addIceCandidate(msg["candidate"])
 	}
 }
