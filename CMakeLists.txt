@@ -4,10 +4,12 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project("koinonia")
 
-add_subdirectory("drogon")
-
-# disable ORM
+# disable unused drogon stuff
+option(BUILD_CTL OFF)
+option(BUILD_EXAMPLES OFF)
 option(BUILD_ORM OFF)
+
+add_subdirectory("drogon")
 
 add_executable(${PROJECT_NAME}
   src/main.cpp
