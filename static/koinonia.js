@@ -29,13 +29,11 @@ ws.onopen = async function() {
 function get_participant(peer_uuid) {
 	if (!participants[peer_uuid]) {
 		const pc = new RTCPeerConnection();
-		const rude = peer_uuid < uuid;
 
 		let participant = participants[peer_uuid];
 
 		participant = {
 			"pc": pc,
-			"rude": rude
 		};
 
 		participants[peer_uuid] = participant
@@ -59,19 +57,19 @@ ws.onmessage = async function(e) {
 			const part = get_participant(peer.uuid);
 			const pc = part["pc"];
 
-			if (part["rude"]) {
-				pc.onnegotiationneeded = async function() {
-					const offer = await pc.createOffer()
+			pc.onnegotiationneeded = async function() {
+				const offer = await pc.createOffer()
 
-					pc.setLocalDescription(offer);
+				pc.setLocalDescription(offer);
 
-					ws.send(JSON.stringify({
-						"type": "offer",
-						"uuid": peer.uuid,
-						"offer": offer
-					}));
-				}
+				ws.send(JSON.stringify({
+					"type": "offer",
+					"uuid": peer.uuid,
+					"offer": offer
+				}));
+			}
 
+			if (peer.uuid < uuid) {
 				pc.onnegotiationneeded();
 			}
 
@@ -118,5 +116,12 @@ ws.onmessage = async function(e) {
 	} else if (msg["type"] == "ice") {
 		const pc = get_participant(msg["uuid"])["pc"];
 		pc.addIceCandidate(msg["candidate"])
+	} else if (msg["type"] == "negotiate") {
+		const pc = get_participant(msg["uuid"])["pc"];
+		pc.onnegotiationneeded();
+	} else if (msg["type"] == "debug") {
+		console.log(msg["message"]);
+	} else if (msg["type"] == "error") {
+		alert(msg["message"]);
 	}
 }
