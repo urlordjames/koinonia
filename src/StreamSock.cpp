@@ -120,6 +120,8 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 			}
 
 			participants_mutex.unlock();
+
+			wsConnPtr->send(errorMsg("no such uuid"));
 			break;
 		default:
 			wsConnPtr->send(debugMsg("no server implementation for message type: " + typestring));
