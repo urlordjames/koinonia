@@ -1,5 +1,6 @@
 const url = new URL(window.location.href);
-const ws = new WebSocket("ws://" + url.hostname + ":" + url.port + "/stream");
+const ws_prefix = (url.protocol == "https") ? "wss://" : "ws://";
+const ws = new WebSocket(ws_prefix + url.hostname + ":" + url.port + "/stream");
 const permissions_button = document.getElementById("permissions_button");
 const join_button = document.getElementById("join_button");
 const participant_div = document.getElementById("participant_div");
