@@ -7,3 +7,8 @@ services:
     restart: always
     ports:
       - 8080:8080
+    volumes:
+      - ./certs:/etc/certs
+    environment:
+      CERT_FILE: ${CERT_FILE}
+      KEY_FILE: ${KEY_FILE}

@@ -38,3 +38,6 @@ build
 .vscode
 .vs
 .idea
+
+# SSL certificates
+certs

@@ -8,7 +8,7 @@ int main() {
 	char *cert_file = getenv("CERT_FILE");
 	char *key_file = getenv("KEY_FILE");
 
-	if (cert_file != nullptr && key_file != nullptr) {
+	if (cert_file != nullptr && key_file != nullptr && strlen(cert_file) != 0 && strlen(key_file) != 0) {
 		bool use_ssl = drogon::app().supportSSL();
 
 		if (!use_ssl) {
