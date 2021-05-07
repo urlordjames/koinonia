@@ -38,6 +38,28 @@ function get_participant(peer_uuid) {
 
 		participants[peer_uuid] = participant
 
+		pc.onnegotiationneeded = async function() {
+			const offer = await pc.createOffer()
+
+			pc.setLocalDescription(offer);
+
+			ws.send(JSON.stringify({
+				"type": "offer",
+				"uuid": peer_uuid,
+				"offer": offer
+			}));
+		}
+
+		pc.onicecandidate = function(e) {
+			if (e.candidate) {
+				ws.send(JSON.stringify({
+					"type": "ice",
+					"uuid": peer_uuid,
+					"candidate": e.candidate
+				}));
+			}
+		}
+
 		return participant;
 	} else return participants[peer_uuid];
 }
@@ -57,30 +79,8 @@ ws.onmessage = async function(e) {
 			const part = get_participant(peer.uuid);
 			const pc = part["pc"];
 
-			pc.onnegotiationneeded = async function() {
-				const offer = await pc.createOffer()
-
-				pc.setLocalDescription(offer);
-
-				ws.send(JSON.stringify({
-					"type": "offer",
-					"uuid": peer.uuid,
-					"offer": offer
-				}));
-			}
-
 			if (peer.uuid < uuid) {
 				pc.onnegotiationneeded();
-			}
-
-			pc.onicecandidate = function(e) {
-				if (e.candidate) {
-					ws.send(JSON.stringify({
-						"type": "ice",
-						"uuid": peer.uuid,
-						"candidate": e.candidate
-					}));
-				}
 			}
 
 			pc.ontrack = function(e) {
