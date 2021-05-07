@@ -5,10 +5,12 @@ services:
     image: "koinonia"
     build: .
     restart: always
-    ports:
-      - 8080:8080
+
+  nginx_proxy:
+    image: nginx:latest
     volumes:
-      - ./certs:/etc/certs
-    environment:
-      CERT_FILE: ${CERT_FILE}
-      KEY_FILE: ${KEY_FILE}
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 8080:80
+    depends_on:
+      - koinonia
