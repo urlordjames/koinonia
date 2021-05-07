@@ -60,6 +60,23 @@ function get_participant(peer_uuid) {
 			}
 		}
 
+		if (peer.uuid < uuid) {
+			pc.onnegotiationneeded();
+		}
+
+		pc.ontrack = function(e) {
+			const video = document.createElement("video");
+			const remoteStream = new MediaStream();
+
+			for (track of e.streams[0].getTracks()) {
+				remoteStream.addTrack(track);
+			}
+
+			video.srcObject = remoteStream;
+			participant_div.appendChild(video);
+			video.play();
+		}
+
 		return participant;
 	} else return participants[peer_uuid];
 }
@@ -76,25 +93,8 @@ ws.onmessage = async function(e) {
 		});
 	} else if (msg["type"] == "sync") {
 		for (peer of msg.peers) {
-			const part = get_participant(peer.uuid);
-			const pc = part["pc"];
-
-			if (peer.uuid < uuid) {
-				pc.onnegotiationneeded();
-			}
-
-			pc.ontrack = function(e) {
-				const video = document.createElement("video");
-				const remoteStream = new MediaStream();
-
-				for (track of e.streams[0].getTracks()) {
-					remoteStream.addTrack(track);
-				}
-
-				video.srcObject = remoteStream;
-				participant_div.appendChild(video);
-				video.play();
-			}
+			// refresh local participant list
+			get_participant(peer.uuid);
 		}
 	} else if (msg["type"] == "offer") {
 		const pc = get_participant(msg["uuid"])["pc"];
