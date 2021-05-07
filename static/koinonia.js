@@ -60,7 +60,7 @@ function get_participant(peer_uuid) {
 			}
 		}
 
-		if (peer.uuid < uuid) {
+		if (peer_uuid < uuid) {
 			pc.onnegotiationneeded();
 		}
 
