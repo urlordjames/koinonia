@@ -142,6 +142,13 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 
 void StreamSock::handleConnectionClosed(const WebSocketConnectionPtr& wsConnPtr) {
 	participants_mutex.lock();
+	std::string uuid = wsConnPtr->getContext<SocketInfo>()->uuid;
+
 	participants.erase(wsConnPtr);
+
+	for (auto i : participants) {
+		i->send(leaveMsg(uuid));
+	}
+
 	participants_mutex.unlock();
 }

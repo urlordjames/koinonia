@@ -123,5 +123,11 @@ ws.onmessage = async function(e) {
 		console.log(msg["message"]);
 	} else if (msg["type"] == "error") {
 		alert(msg["message"]);
+	} else if (msg["type"] == "leave") {
+		const part = participants[msg["uuid"]]
+		if (part) {
+			part["pc"].close()
+			delete participants[msg["uuid"]];
+		}
 	}
 }

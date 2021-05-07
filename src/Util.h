@@ -13,3 +13,4 @@ std::string syncMsg(Json::Value &peers);
 std::string offerMsg(std::string &uuid, Json::Value &offer);
 std::string answerMsg(std::string &uuid, Json::Value &answer);
 std::string iceMsg(std::string &uuid, Json::Value &candidate);
+std::string leaveMsg(std::string &uuid);
