@@ -1,6 +1,6 @@
 FROM alpine:latest as builder
 
-RUN apk add --no-cache gcc g++ cmake ninja jsoncpp-dev zlib-dev git util-linux-dev brotli-dev
+RUN apk add --no-cache gcc g++ cmake ninja jsoncpp-dev zlib-dev git util-linux-dev brotli-dev openssl-dev
 RUN adduser koinonia -H -D && mkdir /compile && chown koinonia:koinonia /compile
 
 USER koinonia
@@ -18,7 +18,7 @@ RUN cmake --configure .. -GNinja -DCMAKE_BUILD_TYPE=Release && cmake --build . -
 
 FROM alpine:latest
 
-RUN apk add --no-cache jsoncpp util-linux brotli
+RUN apk add --no-cache jsoncpp util-linux brotli openssl
 RUN adduser koinonia -H -D && mkdir /koinonia && chown koinonia:koinonia /koinonia
 
 USER koinonia
