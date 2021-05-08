@@ -1,8 +1,8 @@
 const url = new URL(window.location.href);
 const ws_prefix = (url.protocol == "https:") ? "wss://" : "ws://";
 const ws = new WebSocket(ws_prefix + url.hostname + ":" + url.port + "/stream");
-const permissions_button = document.getElementById("permissions_button");
 const join_button = document.getElementById("join_button");
+const permissions_button = document.getElementById("permissions_button");
 const participant_div = document.getElementById("participant_div");
 
 let participants = {}
@@ -91,6 +91,7 @@ ws.onmessage = async function(e) {
 			ws.send(JSON.stringify({"type": "sync"}));
 			join_button.remove();
 			delete join_button;
+			permissions_button.disabled = false;
 		});
 	} else if (msg["type"] == "sync") {
 		for (peer of msg.peers) {
