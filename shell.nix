@@ -1,12 +1,15 @@
 { pkgs ? import <nixpkgs> {} }:
 pkgs.mkShell {
-  buildInputs = with pkgs; [
-    cmake
-    ninja
-    openssl
-    jsoncpp
-    libuuid
-    brotli
-    zlib
-  ];
+	nativeBuildInputs = with pkgs; [
+		cmake
+		ninja
+	];
+
+	buildInputs = with pkgs; [
+		openssl
+		jsoncpp
+		libuuid
+		brotli
+		zlib
+	];
 }
