@@ -29,7 +29,18 @@ ws.onopen = async function() {
 
 function get_participant(peer_uuid) {
 	if (!participants[peer_uuid]) {
-		const pc = new RTCPeerConnection();
+		const config = {
+			"iceServers": [
+				{
+					"urls": [
+						// temporary stun server, will be changed when coturn is added to docker-compose
+						"stun:stun.l.google.com:19302",
+					]
+				}
+			]
+		}
+
+		const pc = new RTCPeerConnection(config);
 
 		let participant = participants[peer_uuid];
 
