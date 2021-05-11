@@ -30,6 +30,10 @@ ws.onopen = async function() {
 	ws.send(JSON.stringify({"type": "uuid"}));
 }
 
+ws.onclose = function() {
+	permissions_button.disabled = true;
+}
+
 function get_participant(peer_uuid) {
 	if (!participants[peer_uuid]) {
 		const config = {
