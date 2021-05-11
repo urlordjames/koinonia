@@ -1,5 +1,4 @@
 #include <json/json.h>
-#include <memory>
 
 Json::Value parseJSON(std::string *str);
 
