@@ -71,6 +71,13 @@ std::string iceMsg(std::string &uuid, Json::Value &candidate) {
 	return stringify(msg);
 }
 
+std::string joinMsg(std::string &uuid) {
+	Json::Value msg;
+	msg["type"] = "join";
+	msg["uuid"] = uuid;
+	return stringify(msg);
+}
+
 std::string leaveMsg(std::string &uuid) {
 	Json::Value msg;
 	msg["type"] = "leave";

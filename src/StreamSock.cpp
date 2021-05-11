@@ -134,6 +134,11 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 	wsConnPtr->setContext(info);
 
 	participants_mutex.lock();
+
+	for (auto i : participants) {
+		i->send(joinMsg(info->uuid));
+	}
+
 	participants.insert(wsConnPtr);
 	participants_mutex.unlock();
 
