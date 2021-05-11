@@ -54,25 +54,7 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 			wsConnPtr->send(uuidMsg(info->uuid));
 			break;
 		case msgType::sync:
-			{
-				Json::Value to_send(Json::arrayValue);
-
-				participants_mutex.lock();
-
-				for (auto i : participants) {
-					auto participant = i->getContext<SocketInfo>();
-					if (i != wsConnPtr) {
-						// this is a json object because I may want to attach additional information in the future like a username
-						Json::Value part_json;
-						part_json["uuid"] = participant->uuid;
-						to_send.append(part_json);
-					}
-				}
-
-				participants_mutex.unlock();
-
-				wsConnPtr->send(syncMsg(to_send));
-			}
+			wsConnPtr->send(errorMsg("sync is deprecated"));
 			break;
 		case msgType::offer:
 			// TODO: maybe use std::map instead
@@ -133,14 +115,26 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 	info->uuid = drogon::utils::getUuid();
 	wsConnPtr->setContext(info);
 
+	Json::Value to_send(Json::arrayValue);
+
 	participants_mutex.lock();
 
 	for (auto i : participants) {
+		// inform all participants of new participant
 		i->send(joinMsg(info->uuid));
+
+		// sync state with new connection
+		// this is a json object because I may want to attach additional information in the future like a username
+		auto p = i->getContext<SocketInfo>();
+		Json::Value part_json;
+		part_json["uuid"] = p->uuid;
+		to_send.append(part_json);
 	}
 
 	participants.insert(wsConnPtr);
 	participants_mutex.unlock();
+
+	wsConnPtr->send(syncMsg(to_send));
 
 	wsConnPtr->send(debugMsg("hello!"));
 }

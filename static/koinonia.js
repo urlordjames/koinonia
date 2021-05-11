@@ -1,8 +1,11 @@
 const url = new URL(window.location.href);
 const ws_prefix = (url.protocol == "https:") ? "wss://" : "ws://";
 const ws = new WebSocket(ws_prefix + url.hostname + ":" + url.port + "/stream");
-const join_button = document.getElementById("join_button");
+
 const permissions_button = document.getElementById("permissions_button");
+// on firefox even though the button is set to disabled in HTML, it becomes enabled again when you reload
+permissions_button.disabled = true;
+
 const participant_div = document.getElementById("participant_div");
 
 let participants = {}
@@ -86,6 +89,7 @@ function get_participant(peer_uuid) {
 
 			video.srcObject = remoteStream;
 			participant_div.appendChild(video);
+			// TODO: deal with autoplay disabled issues
 			video.play();
 		}
 
@@ -97,13 +101,7 @@ ws.onmessage = async function(e) {
 	const msg = JSON.parse(e.data);
 	if (msg["type"] == "uuid") {
 		uuid = msg.uuid;
-		join_button.disabled = false;
-		join_button.addEventListener("click", function(e) {
-			ws.send(JSON.stringify({"type": "sync"}));
-			join_button.remove();
-			delete join_button;
-			permissions_button.disabled = false;
-		});
+		permissions_button.disabled = false;
 	} else if (msg["type"] == "sync") {
 		for (peer of msg.peers) {
 			// refresh local participant list
