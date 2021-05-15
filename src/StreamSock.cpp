@@ -1,10 +1,10 @@
 #include "StreamSock.h"
 #include "SocketInfo.h"
 #include "Util.h"
+#include "Messages.h"
 
 enum class msgType {
 	uuid,
-	sync,
 	offer,
 	answer,
 	ice,
@@ -12,7 +12,6 @@ enum class msgType {
 
 const std::unordered_map<std::string, msgType> typelookup = {
 	{"uuid", msgType::uuid},
-	{"sync", msgType::sync},
 	{"offer", msgType::offer},
 	{"answer", msgType::answer},
 	{"ice", msgType::ice},
@@ -52,9 +51,6 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 	switch (msgtype) {
 		case msgType::uuid:
 			wsConnPtr->send(uuidMsg(info->uuid));
-			break;
-		case msgType::sync:
-			wsConnPtr->send(errorMsg("sync is deprecated"));
 			break;
 		case msgType::offer:
 			// TODO: maybe use std::map instead
@@ -135,14 +131,12 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 	participants_mutex.unlock();
 
 	wsConnPtr->send(syncMsg(to_send));
-
-	wsConnPtr->send(debugMsg("hello!"));
 }
 
 void StreamSock::handleConnectionClosed(const WebSocketConnectionPtr& wsConnPtr) {
-	participants_mutex.lock();
 	std::string uuid = wsConnPtr->getContext<SocketInfo>()->uuid;
 
+	participants_mutex.lock();
 	participants.erase(wsConnPtr);
 
 	for (auto i : participants) {
