@@ -1,5 +1,11 @@
+#include <string>
+#include <mutex>
+
 class SocketInfo {
-// this should probably be private later with setter/getter methods that lock/unlock a mutex, but for now this is probably fine (tm)
-public:
+private:
 	std::string uuid = "";
+	std::mutex uuid_mutex;
+public:
+	const std::string getUuid();
+	void setUuid(const std::string &uuid);
 };

@@ -5,12 +5,12 @@ std::string errorMsg(std::string message);
 std::string debugMsg(std::string message);
 
 // for participant sync
-std::string uuidMsg(std::string &uuid);
-std::string syncMsg(Json::Value &peers);
-std::string joinMsg(std::string &uuid);
-std::string leaveMsg(std::string &uuid);
+std::string uuidMsg(const std::string &uuid);
+std::string syncMsg(const Json::Value &peers);
+std::string joinMsg(const std::string &uuid);
+std::string leaveMsg(const std::string &uuid);
 
 // for WebRTC signaling
-std::string offerMsg(std::string &uuid, Json::Value &offer);
-std::string answerMsg(std::string &uuid, Json::Value &answer);
-std::string iceMsg(std::string &uuid, Json::Value &candidate);
+std::string offerMsg(const std::string &uuid, const Json::Value &offer);
+std::string answerMsg(const std::string &uuid, const Json::Value &answer);
+std::string iceMsg(const std::string &uuid, const Json::Value &candidate);

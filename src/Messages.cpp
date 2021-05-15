@@ -19,28 +19,28 @@ std::string debugMsg(std::string message) {
 
 // participant sync
 
-std::string uuidMsg(std::string &uuid) {
+std::string uuidMsg(const std::string &uuid) {
 	Json::Value msg;
 	msg["type"] = "uuid";
 	msg["uuid"] = uuid;
 	return stringify(msg);
 }
 
-std::string syncMsg(Json::Value &peers) {
+std::string syncMsg(const Json::Value &peers) {
 	Json::Value sync;
 	sync["type"] = "sync";
 	sync["peers"] = peers;
 	return stringify(sync);
 }
 
-std::string joinMsg(std::string &uuid) {
+std::string joinMsg(const std::string &uuid) {
 	Json::Value msg;
 	msg["type"] = "join";
 	msg["uuid"] = uuid;
 	return stringify(msg);
 }
 
-std::string leaveMsg(std::string &uuid) {
+std::string leaveMsg(const std::string &uuid) {
 	Json::Value msg;
 	msg["type"] = "leave";
 	msg["uuid"] = uuid;
@@ -49,7 +49,7 @@ std::string leaveMsg(std::string &uuid) {
 
 // signaling
 
-std::string offerMsg(std::string &uuid, Json::Value &offer) {
+std::string offerMsg(const std::string &uuid, const Json::Value &offer) {
 	Json::Value msg;
 	msg["type"] = "offer";
 	msg["uuid"] = uuid;
@@ -57,7 +57,7 @@ std::string offerMsg(std::string &uuid, Json::Value &offer) {
 	return stringify(msg);
 }
 
-std::string answerMsg(std::string &uuid, Json::Value &answer) {
+std::string answerMsg(const std::string &uuid, const Json::Value &answer) {
 	Json::Value msg;
 	msg["type"] = "answer";
 	msg["uuid"] = uuid;
@@ -65,7 +65,7 @@ std::string answerMsg(std::string &uuid, Json::Value &answer) {
 	return stringify(msg);
 }
 
-std::string iceMsg(std::string &uuid, Json::Value &candidate) {
+std::string iceMsg(const std::string &uuid, const Json::Value &candidate) {
 	Json::Value msg;
 	msg["type"] = "ice";
 	msg["uuid"] = uuid;

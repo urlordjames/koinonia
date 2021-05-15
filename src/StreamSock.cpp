@@ -50,7 +50,7 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 	auto info = wsConnPtr->getContext<SocketInfo>();
 	switch (msgtype) {
 		case msgType::uuid:
-			wsConnPtr->send(uuidMsg(info->uuid));
+			wsConnPtr->send(uuidMsg(info->getUuid()));
 			break;
 		case msgType::offer:
 			// TODO: maybe use std::map instead
@@ -58,8 +58,8 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 
 			for (auto i : participants) {
 				auto p = i->getContext<SocketInfo>();
-				if (p->uuid == m["uuid"].asString()) {
-					i->send(offerMsg(info->uuid, m["offer"]));
+				if (p->getUuid() == m["uuid"].asString()) {
+					i->send(offerMsg(info->getUuid(), m["offer"]));
 					participants_mutex.unlock();
 					return;
 				}
@@ -74,8 +74,8 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 
 			for (auto i : participants) {
 				auto p = i->getContext<SocketInfo>();
-				if (p->uuid == m["uuid"].asString()) {
-					i->send(answerMsg(info->uuid, m["answer"]));
+				if (p->getUuid() == m["uuid"].asString()) {
+					i->send(answerMsg(info->getUuid(), m["answer"]));
 					participants_mutex.unlock();
 					return;
 				}
@@ -90,8 +90,8 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 
 			for (auto i : participants) {
 				auto p = i->getContext<SocketInfo>();
-				if (p->uuid == m["uuid"].asString()) {
-					i->send(iceMsg(info->uuid, m["candidate"]));
+				if (p->getUuid() == m["uuid"].asString()) {
+					i->send(iceMsg(info->getUuid(), m["candidate"]));
 					participants_mutex.unlock();
 					return;
 				}
@@ -108,7 +108,7 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 
 void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketConnectionPtr& wsConnPtr) {
 	auto info = std::make_shared<SocketInfo>();
-	info->uuid = drogon::utils::getUuid();
+	info->setUuid(drogon::utils::getUuid());
 	wsConnPtr->setContext(info);
 
 	Json::Value to_send(Json::arrayValue);
@@ -117,13 +117,13 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 
 	for (auto i : participants) {
 		// inform all participants of new participant
-		i->send(joinMsg(info->uuid));
+		i->send(joinMsg(info->getUuid()));
 
 		// sync state with new connection
 		// this is a json object because I may want to attach additional information in the future like a username
 		auto p = i->getContext<SocketInfo>();
 		Json::Value part_json;
-		part_json["uuid"] = p->uuid;
+		part_json["uuid"] = p->getUuid();
 		to_send.append(part_json);
 	}
 
@@ -134,7 +134,7 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 }
 
 void StreamSock::handleConnectionClosed(const WebSocketConnectionPtr& wsConnPtr) {
-	std::string uuid = wsConnPtr->getContext<SocketInfo>()->uuid;
+	std::string uuid = wsConnPtr->getContext<SocketInfo>()->getUuid();
 
 	participants_mutex.lock();
 	participants.erase(wsConnPtr);

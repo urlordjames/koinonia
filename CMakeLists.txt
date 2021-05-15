@@ -12,10 +12,11 @@ option(BUILD_ORM OFF)
 add_subdirectory("drogon")
 
 add_executable(${PROJECT_NAME}
-  src/main.cpp
-  src/StreamSock.cpp
-  src/Util.cpp
-  src/Messages.cpp
+	src/main.cpp
+	src/SocketInfo.cpp
+	src/StreamSock.cpp
+	src/Util.cpp
+	src/Messages.cpp
 )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
