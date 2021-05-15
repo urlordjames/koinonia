@@ -1,12 +1,13 @@
 #include "Util.h"
 
-Json::Value parseJSON(std::string *str) {
+Json::CharReaderBuilder builder;
+Json::CharReader *reader = builder.newCharReader();
+
+Json::Value parseJSON(std::string &str) {
 	Json::Value value;
-	Json::CharReaderBuilder builder;
-	Json::CharReader *reader = builder.newCharReader();
 	JSONCPP_STRING err;
-	bool success = reader->parse(str->c_str(), str->c_str() + str->length(), &value, &err);
-	delete reader;
+	const char *c_str = str.c_str();
+	bool success = reader->parse(c_str, c_str + str.length(), &value, &err);
 	if (success) {
 		return value;
 	} else {

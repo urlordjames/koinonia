@@ -25,7 +25,7 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 
 	Json::Value m;
 	try {
-		m = parseJSON(&message);
+		m = parseJSON(message);
 	} catch (std::string err) {
 		wsConnPtr->send(errorMsg(err));
 		return;
