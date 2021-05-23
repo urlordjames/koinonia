@@ -6,7 +6,6 @@ RUN adduser koinonia -H -D && mkdir /compile && chown koinonia:koinonia /compile
 USER koinonia
 WORKDIR /compile
 
-COPY --chown=koinonia:koinonia drogon drogon
 COPY CMakeLists.txt .
 COPY src src
 COPY static static
