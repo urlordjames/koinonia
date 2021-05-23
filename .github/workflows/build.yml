@@ -9,11 +9,9 @@ jobs:
 
     steps:
     - name: "dependancies"
-      run: "apk add --no-cache gcc g++ cmake ninja jsoncpp-dev zlib-dev util-linux-dev brotli-dev git"
+      run: "apk add --no-cache gcc g++ cmake ninja jsoncpp-dev zlib-dev util-linux-dev git"
 
     - uses: "actions/checkout@v2"
-      with:
-        submodules: "recursive"
 
     - name: "configure cmake"
       run: "mkdir build && cd build && cmake --configure .. -GNinja -DCMAKE_BUILD_TYPE=Debug"

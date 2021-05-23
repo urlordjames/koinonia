@@ -2,7 +2,6 @@
 #include <iostream>
 
 int main() {
-	drogon::app().enableBrotli(true);
 	drogon::app().setDocumentRoot("static");
 
 	char *cert_file = getenv("CERT_FILE");

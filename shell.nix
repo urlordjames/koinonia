@@ -9,7 +9,6 @@ pkgs.mkShell {
 		openssl
 		jsoncpp
 		libuuid
-		brotli
 		zlib
 	];
 }
