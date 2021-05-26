@@ -9,7 +9,7 @@ jobs:
 
     steps:
     - name: "dependancies"
-      run: "apk add --no-cache gcc g++ cmake ninja jsoncpp-dev zlib-dev util-linux-dev git"
+      run: "apk add --no-cache gcc g++ cmake ninja jsoncpp-dev zlib-dev util-linux-dev lua-dev git"
 
     - uses: "actions/checkout@v2"
 

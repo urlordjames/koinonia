@@ -10,5 +10,6 @@ pkgs.mkShell {
 		jsoncpp
 		libuuid
 		zlib
+		lua
 	];
 }

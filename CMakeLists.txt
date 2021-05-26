@@ -33,6 +33,14 @@ if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
 	endif()
 endif()
 
+option(USE_LUA_PLUGINS "compile with Lua to allow for running user created plugins" ON)
+
+if(USE_LUA_PLUGINS)
+	find_package(Lua REQUIRED)
+	target_link_libraries(${PROJECT_NAME} PRIVATE ${LUA_LIBRARIES})
+	target_compile_definitions(${PROJECT_NAME} PRIVATE USE_LUA_PLUGINS)
+endif()
+
 target_link_libraries(${PROJECT_NAME} PRIVATE drogon)
 
 # copy static files
