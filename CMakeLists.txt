@@ -11,13 +11,32 @@ FetchContent_Declare(drogon_git
 	GIT_TAG "v1.6.0"
 )
 
-add_executable(${PROJECT_NAME}
+set(PROJECT_SOURCES
 	src/main.cpp
 	src/SocketInfo.cpp
 	src/StreamSock.cpp
 	src/Util.cpp
 	src/Messages.cpp
 )
+
+option(USE_LUA_PLUGINS "compile with Lua to allow for running user created plugins" ON)
+
+if(USE_LUA_PLUGINS)
+	list(APPEND PROJECT_SOURCES
+		src/Plugin.cpp
+		src/PluginManager.cpp
+	)
+endif()
+
+add_executable(${PROJECT_NAME}
+	${PROJECT_SOURCES}
+)
+
+if(USE_LUA_PLUGINS)
+	find_package(Lua REQUIRED)
+	target_link_libraries(${PROJECT_NAME} PRIVATE ${LUA_LIBRARIES})
+	target_compile_definitions(${PROJECT_NAME} PRIVATE "USE_LUA_PLUGINS")
+endif()
 
 # disable unused drogon stuff
 option(BUILD_CTL OFF)
@@ -31,14 +50,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
 	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 		set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-Wall -Wextra")
 	endif()
-endif()
-
-option(USE_LUA_PLUGINS "compile with Lua to allow for running user created plugins" ON)
-
-if(USE_LUA_PLUGINS)
-	find_package(Lua REQUIRED)
-	target_link_libraries(${PROJECT_NAME} PRIVATE ${LUA_LIBRARIES})
-	target_compile_definitions(${PROJECT_NAME} PRIVATE USE_LUA_PLUGINS)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE drogon)

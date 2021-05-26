@@ -20,6 +20,11 @@ const std::unordered_map<std::string, msgType> typelookup = {
 std::unordered_set<WebSocketConnectionPtr> participants;
 std::mutex participants_mutex;
 
+#ifdef USE_LUA_PLUGINS
+#include "PluginManager.h"
+KPluginManager pluginManager("plugins");
+#endif
+
 void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::string&& message, const WebSocketMessageType& type) {
 	if (type != WebSocketMessageType::Text) return;
 
@@ -128,6 +133,11 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 	}
 
 	participants.insert(wsConnPtr);
+
+#ifdef USE_LUA_PLUGINS
+	pluginManager.onJoin();
+#endif
+
 	participants_mutex.unlock();
 
 	wsConnPtr->send(syncMsg(to_send));
