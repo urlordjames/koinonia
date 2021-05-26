@@ -1,3 +1,3 @@
-function on_join()
-	print("hello!")
+function on_join(uuid)
+	print("hello " .. uuid)
 end

@@ -11,8 +11,8 @@ KPluginManager::KPluginManager(const std::string plugin_path) {
 	}
 }
 
-void KPluginManager::onJoin() {
+void KPluginManager::onJoin(const std::string &uuid) {
 	for (auto p : plugins) {
-		p->onJoin();
+		p->onJoin(uuid);
 	}
 }

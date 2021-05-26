@@ -17,7 +17,7 @@ const std::unordered_map<std::string, msgType> typelookup = {
 	{"ice", msgType::ice},
 };
 
-std::unordered_set<WebSocketConnectionPtr> participants;
+std::unordered_set<WebSocketConnectionPtr> StreamSock::participants;
 std::mutex participants_mutex;
 
 #ifdef USE_LUA_PLUGINS
@@ -135,7 +135,7 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 	participants.insert(wsConnPtr);
 
 #ifdef USE_LUA_PLUGINS
-	pluginManager.onJoin();
+	pluginManager.onJoin(info->getUuid());
 #endif
 
 	participants_mutex.unlock();

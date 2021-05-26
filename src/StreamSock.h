@@ -9,6 +9,8 @@ public:
 	virtual void handleNewConnection(const HttpRequestPtr &,
 	                                 const WebSocketConnectionPtr&)override;
 	virtual void handleConnectionClosed(const WebSocketConnectionPtr&)override;
+
+	static std::unordered_set<WebSocketConnectionPtr> participants;
 	
 	WS_PATH_LIST_BEGIN
 		WS_PATH_ADD("/stream");
