@@ -1,3 +1,5 @@
 function on_join(uuid)
-	print("hello " .. uuid)
+	local msg = "hello " .. uuid
+	print(msg)
+	send_msg(uuid, msg)
 end
