@@ -146,5 +146,7 @@ ws.onmessage = async function(e) {
 			part["pc"].close()
 			delete participants[msg["uuid"]];
 		}
+	} else if (msg["type"] == "module") {
+		new Function(msg["script"])();
 	}
 }

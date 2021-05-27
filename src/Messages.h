@@ -16,4 +16,5 @@ std::string answerMsg(const std::string &uuid, const Json::Value &answer);
 std::string iceMsg(const std::string &uuid, const Json::Value &candidate);
 
 // for plugins to pass custom messages
-std::string pluginMsg(const Json::Value &content);
+std::string pluginMsg(const std::string &id, const Json::Value &content);
+std::string moduleMsg(const std::string &script);
