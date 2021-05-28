@@ -57,7 +57,12 @@ KPlugin::KPlugin(const std::string plugin_path, int id) {
 	this->id = id;
 	L = luaL_newstate();
 
+#if LUA_VERSION_NUM >= 502
 	luaL_requiref(L, "string", luaopen_string, true);
+#else
+	lua_pushcfunction(L, luaopen_string);
+	lua_call(L, 0, 0);
+#endif
 
 	lua_register(L, "print", print_lua);
 	lua_register(L, "send_msg", send_msg);
