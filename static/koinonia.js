@@ -135,9 +135,9 @@ ws.onmessage = async function(e) {
 		const pc = get_participant(msg["uuid"])["pc"];
 		pc.onnegotiationneeded();
 	} else if (msg["type"] == "debug") {
-		console.log(msg["message"]);
+		console.log(msg["msg"]);
 	} else if (msg["type"] == "error") {
-		alert(msg["message"]);
+		alert(msg["msg"]);
 	} else if (msg["type"] == "join") {
 		get_participant(msg["uuid"]);
 	} else if (msg["type"] == "leave") {

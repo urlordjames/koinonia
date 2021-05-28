@@ -6,14 +6,14 @@
 std::string errorMsg(std::string message) {
 	Json::Value error;
 	error["type"] = "error";
-	error["message"] = message;
+	error["msg"] = message;
 	return stringify(error);
 }
 
 std::string debugMsg(std::string message) {
 	Json::Value debug;
 	debug["type"] = "debug";
-	debug["message"] = message;
+	debug["msg"] = message;
 	return stringify(debug);
 }
 
@@ -75,11 +75,11 @@ std::string iceMsg(const std::string &uuid, const Json::Value &candidate) {
 
 // plugins
 
-std::string pluginMsg(const std::string &id, const Json::Value &content) {
+std::string pluginMsg(int id, const std::string &message) {
 	Json::Value msg;
 	msg["type"] = "plugin";
 	msg["id"] = id;
-	msg["content"] = content;
+	msg["msg"] = message;
 	return stringify(msg);
 }
 

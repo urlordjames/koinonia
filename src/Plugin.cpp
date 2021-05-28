@@ -22,13 +22,13 @@ std::optional<WebSocketConnectionPtr> getParticipant(const std::string &uuid) {
 }
 
 int send_msg(lua_State *L) {
+	int id = luaL_checkinteger(L, lua_upvalueindex(1));
 	std::string uuid(luaL_checkstring(L, 1));
+
 	std::optional<WebSocketConnectionPtr> result = getParticipant(uuid);
 	if (result.has_value()) {
 		WebSocketConnectionPtr wsConnPtr = result.value();
-		Json::Value msg;
-		msg["message"] = luaL_checkstring(L, 3);
-		wsConnPtr->send(pluginMsg(luaL_checkstring(L, 2), msg));
+		wsConnPtr->send(pluginMsg(id, luaL_checkstring(L, 2)));
 	} else {
 		std::cerr << "ERROR: no such uuid in send_msg from plugin" << std::endl;
 	}
@@ -38,6 +38,7 @@ int send_msg(lua_State *L) {
 int send_module(lua_State *L) {
 	std::string uuid(luaL_checkstring(L, 1));
 	std::string script(luaL_checkstring(L, 2));
+
 	std::optional<WebSocketConnectionPtr> result = getParticipant(uuid);
 	if (result.has_value()) {
 		WebSocketConnectionPtr wsConnPtr = result.value();
@@ -65,8 +66,11 @@ KPlugin::KPlugin(const std::string plugin_path, int id) {
 #endif
 
 	lua_register(L, "print", print_lua);
-	lua_register(L, "send_msg", send_msg);
 	lua_register(L, "send_module", send_module);
+
+	lua_pushinteger(L, id);
+	lua_pushcclosure(L, send_msg, 1);
+	lua_setglobal(L, "send_msg");
 
 	lua_pushinteger(L, id);
 	lua_pushcclosure(L, get_id, 1);
