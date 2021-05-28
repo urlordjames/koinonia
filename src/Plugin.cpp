@@ -48,12 +48,24 @@ int send_module(lua_State *L) {
 	return 0;
 }
 
-KPlugin::KPlugin(const std::string plugin_path) {
+int get_id(lua_State *L) {
+	lua_pushinteger(L, luaL_checkinteger(L, lua_upvalueindex(1)));
+	return 1;
+}
+
+KPlugin::KPlugin(const std::string plugin_path, int id) {
+	this->id = id;
 	L = luaL_newstate();
+
+	luaL_requiref(L, "string", luaopen_string, true);
 
 	lua_register(L, "print", print_lua);
 	lua_register(L, "send_msg", send_msg);
 	lua_register(L, "send_module", send_module);
+
+	lua_pushinteger(L, id);
+	lua_pushcclosure(L, get_id, 1);
+	lua_setglobal(L, "get_id");
 
 	int result = luaL_dofile(L, plugin_path.c_str());
 
@@ -71,6 +83,20 @@ void KPlugin::onJoin(const std::string &uuid) {
 	if (result != LUA_OK) {
 		std::cerr << lua_tostring(L, -1) << std::endl;
 	}
+}
+
+void KPlugin::onMsg(const std::string &msg) {
+	lua_getglobal(L, "on_msg");
+	lua_pushstring(L, msg.c_str());
+	int result = lua_pcall(L, 1, 0, 0);
+
+	if (result != LUA_OK) {
+		std::cerr << lua_tostring(L, -1) << std::endl;
+	}
+}
+
+int KPlugin::getId() {
+	return id;
 }
 
 KPlugin::~KPlugin() {

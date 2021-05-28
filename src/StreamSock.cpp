@@ -8,6 +8,9 @@ enum class msgType {
 	offer,
 	answer,
 	ice,
+#ifdef USE_LUA_PLUGINS
+	plugin,
+#endif
 };
 
 const std::unordered_map<std::string, msgType> typelookup = {
@@ -15,6 +18,9 @@ const std::unordered_map<std::string, msgType> typelookup = {
 	{"offer", msgType::offer},
 	{"answer", msgType::answer},
 	{"ice", msgType::ice},
+#ifdef USE_LUA_PLUGINS
+	{"plugin", msgType::plugin},
+#endif
 };
 
 std::unordered_set<WebSocketConnectionPtr> StreamSock::participants;
@@ -106,6 +112,11 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 
 			wsConnPtr->send(errorMsg("no such uuid"));
 			break;
+#ifdef USE_LUA_PLUGINS
+		case msgType::plugin:
+			pluginManager.passMsg(m["id"].asInt(), m["msg"].asString());
+			break;
+#endif
 		default:
 			wsConnPtr->send(debugMsg("no server implementation for message type: " + typestring));
 	}
