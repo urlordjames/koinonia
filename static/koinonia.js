@@ -101,6 +101,8 @@ function get_participant(peer_uuid) {
 	} else return participants[peer_uuid];
 }
 
+let plugin_callbacks = {};
+
 ws.onmessage = async function(e) {
 	const msg = JSON.parse(e.data);
 	if (msg["type"] == "uuid") {
@@ -148,5 +150,7 @@ ws.onmessage = async function(e) {
 		}
 	} else if (msg["type"] == "module") {
 		new Function(msg["script"])();
+	} else if (msg["type"] == "plugin") {
+		plugin_callbacks[msg["id"]](msg["msg"]);
 	}
 }
