@@ -2,16 +2,28 @@ const url = new URL(window.location.href);
 const ws_prefix = (url.protocol == "https:") ? "wss://" : "ws://";
 const ws = new WebSocket(ws_prefix + url.hostname + ":" + url.port + "/stream");
 
-const permissions_button = document.getElementById("permissions_button");
+const screenshare_button = document.getElementById("screenshare_button");
+const camera_button = document.getElementById("camera_button");
 // on firefox even though the button is set to disabled in HTML, it becomes enabled again when you reload
-permissions_button.disabled = true;
+screenshare_button.disabled = true;
+camera_button.disabled = true;
 
 const participant_div = document.getElementById("participant_div");
 
 let participants = {}
 let uuid;
 
-permissions_button.addEventListener("click", async function(e) {
+function add_tracks(tracks) {
+	for (participant of Object.values(participants)) {
+		const pc = participant["pc"];
+
+		for (track of tracks) {
+			pc.addTrack(track);
+		}
+	}
+}
+
+screenshare_button.addEventListener("click", async function(e) {
 	const localStream = await navigator.mediaDevices.getDisplayMedia({
 		"video": true,
 		// audio does not work on all browsers that support getDisplayMedia
@@ -19,13 +31,15 @@ permissions_button.addEventListener("click", async function(e) {
 		"audio": true
 	});
 
-	for (participant of Object.values(participants)) {
-		const pc = participant["pc"];
+	add_tracks(localStream.getTracks());
+});
 
-		for (track of localStream.getTracks()) {
-			pc.addTrack(track, localStream);
-		}
-	}
+camera_button.addEventListener("click", async function(e) {
+	const localStream = await navigator.mediaDevices.getUserMedia({
+		"video": {"facingMode": "user"}
+	});
+
+	add_tracks(localStream.getTracks());
 });
 
 ws.onopen = async function() {
@@ -33,7 +47,8 @@ ws.onopen = async function() {
 }
 
 ws.onclose = function() {
-	permissions_button.disabled = true;
+	screenshare_button.disabled = true;
+	camera_button.disabled = true;
 }
 
 function get_participant(peer_uuid) {
@@ -112,7 +127,8 @@ ws.onmessage = async function(e) {
 	const msg = JSON.parse(e.data);
 	if (msg["type"] == "uuid") {
 		uuid = msg.uuid;
-		permissions_button.disabled = false;
+		screenshare_button.disabled = false;
+		camera_button.disabled = false;
 	} else if (msg["type"] == "sync") {
 		for (peer of msg.peers) {
 			// refresh local participant list
