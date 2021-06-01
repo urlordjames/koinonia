@@ -14,7 +14,9 @@ let uuid;
 permissions_button.addEventListener("click", async function(e) {
 	const localStream = await navigator.mediaDevices.getDisplayMedia({
 		"video": true,
-		"audio": false
+		// audio does not work on all browsers that support getDisplayMedia
+		// see https://caniuse.com/mdn-api_mediadevices_getdisplaymedia_audio-capture-support
+		"audio": true
 	});
 
 	for (participant of Object.values(participants)) {
