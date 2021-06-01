@@ -10,7 +10,7 @@ KPluginManager::KPluginManager(const std::string plugin_path) {
 	int id = 1;
 
 	for (auto script_path : plugin_iterator) {
-		KPlugin *plugin = new KPlugin(script_path.path(), id++);
+		KPlugin *plugin = new KPlugin(script_path.path().string(), id++);
 		plugins.insert(plugin);
 	}
 }
