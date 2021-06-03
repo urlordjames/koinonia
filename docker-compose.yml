@@ -6,6 +6,13 @@ services:
     build: .
     restart: always
 
+  coturn:
+    image: coturn/coturn
+    # TODO: change to ports
+    network_mode: host
+    # TODO: maybe make password rotate every n minutes so this can't be easily exploited
+    command: "-n -a -r koinonia -v -f -u koinonia:koinonia -X $$(detect-external-ip)"
+
   nginx_proxy:
     image: nginx:latest
     volumes:
@@ -15,3 +22,4 @@ services:
       - 8080:80
     depends_on:
       - koinonia
+      - coturn
