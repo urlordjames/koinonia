@@ -51,20 +51,22 @@ ws.onclose = function() {
 	camera_button.disabled = true;
 }
 
+let rtc_config = {}
+
+fetch("/rtc_config.txt").then(function (resp) {
+	if (!resp.ok) {
+		console.error("failed to fetch rtc config");
+		return;
+	}
+
+	resp.json().then(function (json) {
+		rtc_config = json;
+	});
+});
+
 function get_participant(peer_uuid) {
 	if (!participants[peer_uuid]) {
-		const config = {
-			"iceServers": [
-				{
-					"urls": [
-						// temporary stun server, will be changed when coturn is added to docker-compose
-						"stun:stun.l.google.com:19302",
-					]
-				}
-			]
-		}
-
-		const pc = new RTCPeerConnection(config);
+		const pc = new RTCPeerConnection(rtc_config);
 
 		let participant = participants[peer_uuid];
 
