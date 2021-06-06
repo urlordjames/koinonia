@@ -1,7 +1,7 @@
 FROM alpine:latest as builder
 
 # alpine bug: lua versions other than 5.1 cannot be discovered by CMake
-RUN apk add --no-cache gcc g++ cmake ninja jsoncpp-dev zlib-dev git util-linux-dev openssl-dev lua-dev
+RUN apk add --no-cache gcc g++ cmake ninja jsoncpp-dev zlib-dev git util-linux-dev lua-dev
 RUN adduser koinonia -H -D && mkdir /compile && chown koinonia:koinonia /compile
 
 USER koinonia
@@ -18,7 +18,7 @@ RUN cmake --configure .. -GNinja -DCMAKE_BUILD_TYPE=Release && cmake --build . -
 
 FROM alpine:latest
 
-RUN apk add --no-cache jsoncpp util-linux openssl lua
+RUN apk add --no-cache jsoncpp util-linux lua
 RUN adduser koinonia -H -D && mkdir /koinonia && chown koinonia:koinonia /koinonia
 
 USER koinonia
