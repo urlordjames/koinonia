@@ -103,19 +103,18 @@ function get_participant(peer_uuid) {
 		}
 
 		pc.ontrack = function(e) {
-			// TODO: check e.track.kind before creating video element, might be an audio track
-			const video = document.createElement("video");
+			const track_element = document.createElement(e.track.kind);
 
 			const remoteStream = new MediaStream();
 			remoteStream.addTrack(e.track);
 
-			video.srcObject = remoteStream;
-			participant_div.appendChild(video);
+			track_element.srcObject = remoteStream;
+			participant_div.appendChild(track_element);
 			// TODO: deal with autoplay disabled issues
-			video.play();
+			track_element.play();
 
 			e.track.onended = function() {
-				video.remove();
+				track_element.remove();
 			}
 		}
 
