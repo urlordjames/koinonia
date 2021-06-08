@@ -21,6 +21,12 @@ void KPluginManager::onJoin(const std::string &uuid) {
 	}
 }
 
+void KPluginManager::onLeave(const std::string &uuid) {
+	for (auto p : plugins) {
+		p->onLeave(uuid);
+	}
+}
+
 void KPluginManager::passMsg(int plugin_id, const std::string &msg) {
 	for (auto p : plugins) {
 		int id = p->getId();

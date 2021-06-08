@@ -94,6 +94,16 @@ void KPlugin::onJoin(const std::string &uuid) {
 	}
 }
 
+void KPlugin::onLeave(const std::string &uuid) {
+	lua_getglobal(L, "on_leave");
+	lua_pushstring(L, uuid.c_str());
+	int result = lua_pcall(L, 1, 0, 0);
+
+	if (result != LUA_OK) {
+		std::cerr << lua_tostring(L, -1) << std::endl;
+	}
+}
+
 void KPlugin::onMsg(const std::string &msg) {
 	lua_getglobal(L, "on_msg");
 	lua_pushstring(L, msg.c_str());

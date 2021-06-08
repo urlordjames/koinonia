@@ -164,5 +164,9 @@ void StreamSock::handleConnectionClosed(const WebSocketConnectionPtr& wsConnPtr)
 		i->send(leaveMsg(uuid));
 	}
 
+#ifdef USE_LUA_PLUGINS
+	pluginManager.onLeave(uuid);
+#endif
+
 	participants_mutex.unlock();
 }

@@ -7,5 +7,6 @@ private:
 public:
 	KPluginManager(const std::string plugins_path);
 	void onJoin(const std::string &uuid);
+	void onLeave(const std::string &uuid);
 	void passMsg(int plugin_id, const std::string &msg);
 };
