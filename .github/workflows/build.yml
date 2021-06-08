@@ -7,14 +7,26 @@ jobs:
     runs-on: "ubuntu-latest"
     container: "alpine:latest"
 
+    strategy:
+      matrix:
+        include:
+          - build: "With Plugins"
+            use_plugins: "ON"
+          - build: "No Plugins"
+            use_plugins: "OFF"
+
     steps:
     - name: "dependancies"
-      run: "apk add --no-cache gcc g++ cmake ninja jsoncpp-dev zlib-dev util-linux-dev lua-dev git"
+      run: "apk add --no-cache gcc g++ cmake ninja jsoncpp-dev zlib-dev util-linux-dev git"
+
+    - name: "install lua"
+      if: matrix.use_plugins == "ON"
+      run: "apk add --no-cache lua-dev"
 
     - uses: "actions/checkout@v2"
 
     - name: "configure cmake"
-      run: "mkdir build && cd build && cmake --configure .. -GNinja -DCMAKE_BUILD_TYPE=Debug"
+      run: "mkdir build && cd build && cmake --configure .. -GNinja -DCMAKE_BUILD_TYPE=Debug -DUSE_LUA_PLUGINS=${{matrix.use_plugins}}"
 
     - name: "build project"
       run: "cmake --build . -j $(nproc)"
