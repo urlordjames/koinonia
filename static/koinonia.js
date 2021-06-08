@@ -116,8 +116,11 @@ function get_participant(peer_uuid) {
 
 			track_element.srcObject = remoteStream;
 			participant_div.appendChild(track_element);
-			// TODO: deal with autoplay disabled issues
-			track_element.play();
+
+			track_element.play().catch(function(error) {
+				console.error(error);
+				alert("failed to play track, autoplay is likely disabled, see developer console for more info");
+			});
 
 			e.track.onended = function() {
 				track_element.remove();
