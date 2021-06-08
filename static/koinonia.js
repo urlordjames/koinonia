@@ -12,34 +12,40 @@ const participant_div = document.getElementById("participant_div");
 
 let participants = {}
 let uuid;
+let local_streams = new Set();
 
 function add_tracks(tracks) {
-	for (participant of Object.values(participants)) {
-		const pc = participant["pc"];
+	for (track of tracks) {
+		local_streams.add(track);
 
-		for (track of tracks) {
+		track.onended = function () {
+			local_streams.remove(track);
+		};
+
+		for (participant of Object.values(participants)) {
+			const pc = participant["pc"];
 			pc.addTrack(track);
 		}
 	}
 }
 
-screenshare_button.addEventListener("click", async function(e) {
-	const localStream = await navigator.mediaDevices.getDisplayMedia({
+screenshare_button.addEventListener("click", function(e) {
+	navigator.mediaDevices.getDisplayMedia({
 		"video": true,
 		// audio does not work on all browsers that support getDisplayMedia
 		// see https://caniuse.com/mdn-api_mediadevices_getdisplaymedia_audio-capture-support
 		"audio": true
+	}).then(function (localStream) {
+		add_tracks(localStream.getTracks());
 	});
-
-	add_tracks(localStream.getTracks());
 });
 
-camera_button.addEventListener("click", async function(e) {
-	const localStream = await navigator.mediaDevices.getUserMedia({
+camera_button.addEventListener("click", function(e) {
+	navigator.mediaDevices.getUserMedia({
 		"video": {"facingMode": "user"}
+	}).then(function(localStream) {
+		add_tracks(localStream.getTracks());
 	});
-
-	add_tracks(localStream.getTracks());
 });
 
 ws.onopen = async function() {
@@ -116,6 +122,10 @@ function get_participant(peer_uuid) {
 			e.track.onended = function() {
 				track_element.remove();
 			}
+		}
+
+		for (track of local_streams) {
+			pc.addTrack(track);
 		}
 
 		return participant;
