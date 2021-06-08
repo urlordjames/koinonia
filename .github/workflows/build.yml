@@ -20,7 +20,7 @@ jobs:
       run: "apk add --no-cache gcc g++ cmake ninja jsoncpp-dev zlib-dev util-linux-dev git"
 
     - name: "install lua"
-      if: matrix.use_plugins == "ON"
+      if: matrix.use_plugins == 'ON'
       run: "apk add --no-cache lua-dev"
 
     - uses: "actions/checkout@v2"
