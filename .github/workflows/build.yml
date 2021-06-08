@@ -37,5 +37,5 @@ jobs:
 
     - uses: "actions/upload-artifact@v2"
       with:
-        name: "server"
+        name: "server (plugins: ${{matrix.use_plugins}})"
         path: "release"
