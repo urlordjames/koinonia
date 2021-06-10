@@ -55,4 +55,8 @@ endif()
 target_link_libraries(${PROJECT_NAME} PRIVATE drogon)
 
 # copy static files
-file(COPY static DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+if(EXISTS "${CMAKE_SOURCE_DIR}/static")
+	file(COPY "static" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+else()
+	message(WARNING "static directory does not exist, will not attempt to copy")
+endif()
