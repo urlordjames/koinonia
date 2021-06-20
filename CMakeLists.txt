@@ -4,12 +4,17 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project("koinonia")
 
-# clone specified release of drogon from GitHub
-include(FetchContent)
-FetchContent_Declare(drogon_git
-	GIT_REPOSITORY "https://github.com/an-tao/drogon.git"
-	GIT_TAG "v1.6.0"
-)
+# attempt to find drogon
+find_package(Drogon)
+
+# clone specified release of drogon from GitHub if drogon not installed
+if(NOT Drogon_FOUND)
+	include(FetchContent)
+	FetchContent_Declare(drogon_git
+		GIT_REPOSITORY "https://github.com/an-tao/drogon.git"
+		GIT_TAG "v1.7.0"
+	)
+endif()
 
 set(PROJECT_SOURCES
 	src/main.cpp
@@ -38,21 +43,29 @@ if(USE_LUA_PLUGINS)
 	target_compile_definitions(${PROJECT_NAME} PRIVATE "USE_LUA_PLUGINS")
 endif()
 
-# disable unused drogon stuff
-option(BUILD_CTL OFF)
-option(BUILD_EXAMPLES OFF)
-option(BUILD_ORM OFF)
-
-FetchContent_MakeAvailable(drogon_git)
+if(NOT Drogon_FOUND)
+	# disable unused drogon stuff if building from source
+	option(BUILD_CTL OFF)
+	option(BUILD_EXAMPLES OFF)
+	option(BUILD_ORM OFF)
+	FetchContent_MakeAvailable(drogon_git)
+endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES GNU)
-	target_compile_options(trantor PRIVATE "-Wno-unused-parameter")
+	if(NOT Drogon_FOUND)
+		target_compile_options(trantor PRIVATE "-Wno-unused-parameter")
+	endif()
+
 	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 		set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-Wall -Wextra")
 	endif()
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE drogon)
+if(Drogon_FOUND)
+	target_link_libraries(${PROJECT_NAME} PRIVATE ${DROGON_LIBRARIES})
+else()
+	target_link_libraries(${PROJECT_NAME} PRIVATE drogon)
+endif()
 
 # copy static files
 if(EXISTS "${CMAKE_SOURCE_DIR}/static")
