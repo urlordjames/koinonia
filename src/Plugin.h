@@ -15,6 +15,7 @@ class KPlugin {
 private:
 	lua_State *L;
 	int id;
+	bool call_func(const char *fname, const std::string &arg);
 public:
 	KPlugin(const std::string script_path, int id);
 	void onJoin(const std::string &uuid);

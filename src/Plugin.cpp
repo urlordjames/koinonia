@@ -84,34 +84,33 @@ KPlugin::KPlugin(const std::string plugin_path, int id) {
 	}
 }
 
-void KPlugin::onJoin(const std::string &uuid) {
-	lua_getglobal(L, "on_join");
-	lua_pushstring(L, uuid.c_str());
+bool KPlugin::call_func(const char *fname, const std::string &arg) {
+	// TODO: workaround for lua >= 5.2
+	if (lua_getglobal(L, fname) != LUA_TFUNCTION) {
+		return true;
+	}
+
+	lua_pushstring(L, arg.c_str());
 	int result = lua_pcall(L, 1, 0, 0);
 
 	if (result != LUA_OK) {
 		std::cerr << lua_tostring(L, -1) << std::endl;
+		return false;
 	}
+
+	return true;
+}
+
+void KPlugin::onJoin(const std::string &uuid) {
+	call_func("on_join", uuid);
 }
 
 void KPlugin::onLeave(const std::string &uuid) {
-	lua_getglobal(L, "on_leave");
-	lua_pushstring(L, uuid.c_str());
-	int result = lua_pcall(L, 1, 0, 0);
-
-	if (result != LUA_OK) {
-		std::cerr << lua_tostring(L, -1) << std::endl;
-	}
+	call_func("on_leave", uuid);
 }
 
 void KPlugin::onMsg(const std::string &msg) {
-	lua_getglobal(L, "on_msg");
-	lua_pushstring(L, msg.c_str());
-	int result = lua_pcall(L, 1, 0, 0);
-
-	if (result != LUA_OK) {
-		std::cerr << lua_tostring(L, -1) << std::endl;
-	}
+	call_func("on_msg", msg);
 }
 
 int KPlugin::getId() {
