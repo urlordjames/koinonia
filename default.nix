@@ -1,4 +1,4 @@
-let pkgs = import (fetchTarball https://github.com/urlordjames/nixpkgs/archive/drogon_options.tar.gz) {};
+let pkgs = import (fetchTarball https://github.com/NixOS/nixpkgs/archive/nixpkgs-unstable.tar.gz) {};
 in pkgs.stdenv.mkDerivation rec {
 	pname = "koinonia";
 	version = "0.1.0";
@@ -11,9 +11,8 @@ in pkgs.stdenv.mkDerivation rec {
 
 	buildInputs = with pkgs; [
 		(drogon.override {
-			brotliSupport = false;
-			c-aresSupport = false;
-			sqliteSupport = false;
+			# TODO: uncomment when this hits unstable
+			#sqliteSupport = false;
 		})
 		lua
 	];

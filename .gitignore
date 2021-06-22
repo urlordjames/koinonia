@@ -33,6 +33,7 @@
 
 # Build Output
 build
+result
 
 # Editor Specific Files
 .vscode
