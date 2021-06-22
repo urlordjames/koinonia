@@ -70,6 +70,10 @@ fetch("/rtc_config.txt").then(function (resp) {
 	});
 });
 
+// for handling autoplay
+let added_button = false;
+let blocked_tracks = [];
+
 function get_participant(peer_uuid) {
 	if (!participants[peer_uuid]) {
 		const pc = new RTCPeerConnection(rtc_config);
@@ -118,8 +122,33 @@ function get_participant(peer_uuid) {
 			participant_div.appendChild(track_element);
 
 			track_element.play().catch(function(error) {
-				console.error(error);
-				alert("failed to play track, autoplay is likely disabled, see developer console for more info");
+				if (error.name === "NotAllowedError") {
+					blocked_tracks.push(track_element);
+
+					if (!added_button) {
+						const autoplay_div = document.createElement("div");
+
+						const info_text = document.createTextNode("your browser is preventing one or more streams from playing");
+						autoplay_div.appendChild(info_text);
+
+						const play_button = document.createElement("button");
+						play_button.innerHTML = "click me to fix";
+						play_button.onclick = async function() {
+							for (track of blocked_tracks) {
+								track.play();
+							}
+							blocked_tracks = null;
+							autoplay_div.remove();
+						};
+						autoplay_div.appendChild(play_button);
+
+						document.body.insertBefore(autoplay_div, document.body.firstChild);
+						added_button = true;
+					}
+				} else {
+					alert("track playback failed, see developer console for more info");
+					console.log(error);
+				}
 			});
 
 			e.track.onended = function() {
