@@ -89,8 +89,8 @@ KPlugin::KPlugin(const std::string plugin_path, int id) {
 }
 
 bool KPlugin::call_func(const char *fname, std::vector<std::string> args) {
-	// TODO: workaround for lua >= 5.2
-	if (lua_getglobal(L, fname) != LUA_TFUNCTION) {
+	lua_getglobal(L, fname);
+	if (lua_type(L, -1) != LUA_TFUNCTION) {
 		return true;
 	}
 
@@ -108,16 +108,12 @@ bool KPlugin::call_func(const char *fname, std::vector<std::string> args) {
 	return true;
 }
 
-bool KPlugin::call_func(const char *fname, const std::string &arg) {
-	return call_func(fname, {arg});
-}
-
 void KPlugin::onJoin(const std::string &uuid) {
-	call_func("on_join", uuid);
+	call_func("on_join", {uuid});
 }
 
 void KPlugin::onLeave(const std::string &uuid) {
-	call_func("on_leave", uuid);
+	call_func("on_leave", {uuid});
 }
 
 void KPlugin::onMsg(const std::string &uuid, const std::string &msg) {

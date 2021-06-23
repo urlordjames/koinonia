@@ -14,7 +14,7 @@ in pkgs.stdenv.mkDerivation rec {
 			# TODO: uncomment when this hits unstable
 			#sqliteSupport = false;
 		})
-		lua5_4
+		lua
 	];
 
 	installPhase = "mkdir -p $out/bin && mv koinonia $out/bin";
