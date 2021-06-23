@@ -27,11 +27,11 @@ void KPluginManager::onLeave(const std::string &uuid) {
 	}
 }
 
-void KPluginManager::passMsg(int plugin_id, const std::string &msg) {
+void KPluginManager::passMsg(int plugin_id, const std::string &uuid, const std::string &msg) {
 	for (auto p : plugins) {
 		int id = p->getId();
 		if (plugin_id == id) {
-			p->onMsg(msg);
+			p->onMsg(uuid, msg);
 			return;
 		}
 	}

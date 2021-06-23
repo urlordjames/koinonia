@@ -60,8 +60,12 @@ KPlugin::KPlugin(const std::string plugin_path, int id) {
 
 #if LUA_VERSION_NUM >= 502
 	luaL_requiref(L, "string", luaopen_string, true);
+	luaL_requiref(L, "table", luaopen_table, true);
 #else
 	lua_pushcfunction(L, luaopen_string);
+	lua_call(L, 0, 0);
+
+	lua_pushcfunction(L, luaopen_table);
 	lua_call(L, 0, 0);
 #endif
 
@@ -84,14 +88,17 @@ KPlugin::KPlugin(const std::string plugin_path, int id) {
 	}
 }
 
-bool KPlugin::call_func(const char *fname, const std::string &arg) {
+bool KPlugin::call_func(const char *fname, std::vector<std::string> args) {
 	// TODO: workaround for lua >= 5.2
 	if (lua_getglobal(L, fname) != LUA_TFUNCTION) {
 		return true;
 	}
 
-	lua_pushstring(L, arg.c_str());
-	int result = lua_pcall(L, 1, 0, 0);
+	for (const std::string &arg : args) {
+		lua_pushstring(L, arg.c_str());
+	}
+
+	int result = lua_pcall(L, args.size(), 0, 0);
 
 	if (result != LUA_OK) {
 		std::cerr << lua_tostring(L, -1) << std::endl;
@@ -99,6 +106,10 @@ bool KPlugin::call_func(const char *fname, const std::string &arg) {
 	}
 
 	return true;
+}
+
+bool KPlugin::call_func(const char *fname, const std::string &arg) {
+	return call_func(fname, {arg});
 }
 
 void KPlugin::onJoin(const std::string &uuid) {
@@ -109,8 +120,8 @@ void KPlugin::onLeave(const std::string &uuid) {
 	call_func("on_leave", uuid);
 }
 
-void KPlugin::onMsg(const std::string &msg) {
-	call_func("on_msg", msg);
+void KPlugin::onMsg(const std::string &uuid, const std::string &msg) {
+	call_func("on_msg", {uuid, msg});
 }
 
 int KPlugin::getId() {

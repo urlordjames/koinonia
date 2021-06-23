@@ -13,7 +13,7 @@ mydiv.appendChild(mybutton);
 mybutton.addEventListener("click", async function() {
 	ws.send(JSON.stringify({
 		"type": "plugin",
-		"id": %s,
+		"id": %d,
 		"msg": myinput.value
 	}));
 });
@@ -25,6 +25,6 @@ function on_join(uuid)
 	send_module(uuid, formatted_script)
 end
 
-function on_msg(msg)
+function on_msg(uuid, msg)
 	print(msg)
 end
