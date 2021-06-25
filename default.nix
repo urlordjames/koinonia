@@ -11,8 +11,7 @@ in pkgs.stdenv.mkDerivation rec {
 
 	buildInputs = with pkgs; [
 		(drogon.override {
-			# TODO: uncomment when this hits unstable
-			#sqliteSupport = false;
+			sqliteSupport = false;
 		})
 		lua
 	];
