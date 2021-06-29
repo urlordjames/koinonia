@@ -1,6 +1,6 @@
 FROM alpine:latest as builder
 
-run mkdir -p /compile/build
+RUN mkdir -p /compile/build
 WORKDIR /compile
 
 # alpine bug: lua versions other than 5.1 cannot be discovered by CMake
