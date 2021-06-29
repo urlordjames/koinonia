@@ -11,7 +11,7 @@ COPY src src
 
 WORKDIR /compile/build
 
-RUN cmake --configure .. -GNinja -DCMAKE_BUILD_TYPE=Release && cmake --build . -j $(nproc)
+RUN cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release && cmake --build . -j $(nproc)
 
 FROM alpine:latest
 
