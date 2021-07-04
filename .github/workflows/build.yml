@@ -3,19 +3,32 @@ name: "build"
 on: ["push", "pull_request"]
 
 jobs:
-  build:
+  build-docker:
     runs-on: "ubuntu-latest"
 
     steps:
     - uses: "actions/checkout@v2"
 
-    - name: "build project"
+    - name: "build"
       run: "docker build -t koinonia ."
 
-    - name: "export image"
+    - name: "export"
       run: "docker save koinonia > koinonia.tar"
 
     - uses: "actions/upload-artifact@v2"
       with:
         name: "docker image"
         path: "koinonia.tar"
+
+  build-nix:
+    runs-on: "ubuntu-latest"
+    container: "nixos/nix"
+
+    steps:
+    - uses: "actions/checkout@v2"
+
+    - name: "add unstable channel"
+      run: "nix-channel --add https://nixos.org/channels/nixpkgs-unstable unstable && nix-channel --update"
+
+    - name: "build"
+      run: "nix-build"
