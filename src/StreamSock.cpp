@@ -114,7 +114,9 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 			break;
 #ifdef USE_LUA_PLUGINS
 		case msgType::plugin:
+			participants_mutex.lock();
 			pluginManager.passMsg(m["id"].asInt(), info->getUuid(), m["msg"].asString());
+			participants_mutex.unlock();
 			break;
 #endif
 		default:
