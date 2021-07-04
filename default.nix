@@ -10,9 +10,7 @@ in pkgs.stdenv.mkDerivation rec {
 	];
 
 	buildInputs = with pkgs; [
-		(drogon.override {
-			sqliteSupport = false;
-		})
+		drogon
 		lua
 	];
 
