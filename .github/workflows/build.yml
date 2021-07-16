@@ -32,3 +32,21 @@ jobs:
 
     - name: "build"
       run: "nix-build"
+
+  build-windows:
+    runs-on: "windows-latest"
+
+    steps:
+    - uses: "actions/checkout@v2"
+
+    - name: "dependancies"
+      run: "vcpkg install drogon:x64-windows lua:x64-windows && vcpkg integrate install && mkdir build"
+
+    - name: "build"
+      run: "cmake .. -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake && cmake --build . --parallel"
+      working-directory: "build"
+
+    - uses: "actions/upload-artifact@v2"
+      with:
+        name: "windows"
+        path: "build/Debug"
