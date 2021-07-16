@@ -46,11 +46,7 @@ jobs:
       run: "cmake .. -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake && cmake --build . --parallel"
       working-directory: "build"
 
-    - name: "make output directory"
-      run: "mkdir output && mv build/koinonia.exe output && mv build/*.dll output && mv static output"
-      shell: bash
-
     - uses: "actions/upload-artifact@v2"
       with:
         name: "windows"
-        path: "output"
+        path: "build/Debug"
