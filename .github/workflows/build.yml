@@ -40,7 +40,13 @@ jobs:
     - uses: "actions/checkout@v2"
 
     - name: "dependancies"
-      run: "vcpkg install drogon:x64-windows lua:x64-windows && vcpkg integrate install"
+      run: "vcpkg install drogon:x64-windows lua:x64-windows && vcpkg integrate install && mkdir build"
 
     - name: "build"
-      run: "mkdir build && cd build && cmake .. && cmake --build . -j"
+      run: "cmake .. -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake && cmake --build . --target install --parallel"
+      working-directory: "build"
+
+    - uses: "actions/upload-artifact@v2"
+      with:
+        name: "windows executable"
+        path: "build/bin"
