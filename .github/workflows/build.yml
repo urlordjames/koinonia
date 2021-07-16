@@ -43,7 +43,7 @@ jobs:
       run: "vcpkg install drogon:x64-windows lua:x64-windows && vcpkg integrate install && mkdir build"
 
     - name: "build"
-      run: "cmake .. -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake && cmake --build . --parallel"
+      run: "cmake .. -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake && cmake --build . --parallel && mv static Debug"
       working-directory: "build"
 
     - uses: "actions/upload-artifact@v2"
