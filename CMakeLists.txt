@@ -11,7 +11,7 @@ find_package(Drogon)
 if(NOT Drogon_FOUND)
 	include(FetchContent)
 	FetchContent_Declare(drogon_git
-		GIT_REPOSITORY "https://github.com/an-tao/drogon.git"
+		GIT_REPOSITORY "https://github.com/drogonframework/drogon.git"
 		GIT_TAG "v1.7.1"
 	)
 endif()
