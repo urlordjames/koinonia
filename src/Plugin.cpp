@@ -61,11 +61,15 @@ KPlugin::KPlugin(const std::string plugin_path, int id) {
 #if LUA_VERSION_NUM >= 502
 	luaL_requiref(L, "string", luaopen_string, true);
 	luaL_requiref(L, "table", luaopen_table, true);
+	luaL_requiref(L, "math", luaopen_math, true);
 #else
 	lua_pushcfunction(L, luaopen_string);
 	lua_call(L, 0, 0);
 
 	lua_pushcfunction(L, luaopen_table);
+	lua_call(L, 0, 0);
+
+	lua_pushcfunction(L, luaopen_math);
 	lua_call(L, 0, 0);
 #endif
 
