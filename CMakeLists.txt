@@ -37,6 +37,9 @@ add_executable(${PROJECT_NAME}
 	${PROJECT_SOURCES}
 )
 
+set(STATIC_ROOT "static" CACHE FILEPATH "directory to serve static files from")
+target_compile_definitions(${PROJECT_NAME} PRIVATE STATIC_ROOT="${STATIC_ROOT}")
+
 if(USE_LUA_PLUGINS)
 	find_package(Lua REQUIRED)
 	target_link_libraries(${PROJECT_NAME} PRIVATE ${LUA_LIBRARIES})
@@ -73,3 +76,6 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/static")
 else()
 	message(WARNING "static directory does not exist, will not attempt to copy")
 endif()
+
+install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+install(DIRECTORY "static" DESTINATION extras)

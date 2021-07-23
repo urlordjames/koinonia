@@ -2,7 +2,7 @@
 #include <filesystem>
 
 int main() {
-	drogon::app().setDocumentRoot("static");
+	drogon::app().setDocumentRoot(STATIC_ROOT);
 
 	std::filesystem::path upload_path = std::filesystem::temp_directory_path() / "koinonia_uploads";
 	// explicit string conversion required, doesn't compile on Windows otherwise

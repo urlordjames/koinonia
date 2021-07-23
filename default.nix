@@ -14,5 +14,7 @@ in pkgs.stdenv.mkDerivation rec {
 		lua
 	];
 
-	installPhase = "mkdir -p $out/bin && mv koinonia $out/bin";
+	preConfigure = ''
+		export cmakeFlags="$cmakeFlags -DSTATIC_ROOT=$out/extras/static"
+	'';
 }
