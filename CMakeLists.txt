@@ -37,7 +37,7 @@ add_executable(${PROJECT_NAME}
 	${PROJECT_SOURCES}
 )
 
-set(STATIC_ROOT "static" CACHE FILEPATH "directory to serve static files from")
+set(STATIC_ROOT "static" CACHE PATH "directory to serve static files from")
 target_compile_definitions(${PROJECT_NAME} PRIVATE STATIC_ROOT="${STATIC_ROOT}")
 
 if(USE_LUA_PLUGINS)
