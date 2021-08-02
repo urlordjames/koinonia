@@ -129,13 +129,15 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 	info->setUuid(drogon::utils::getUuid());
 	wsConnPtr->setContext(info);
 
+	const std::string join_msg = joinMsg(info->getUuid());
+
 	Json::Value to_send(Json::arrayValue);
 
 	participants_mutex.lock();
 
 	for (auto i : participants) {
 		// inform all participants of new participant
-		i->send(joinMsg(info->getUuid()));
+		i->send(join_msg);
 
 		// sync state with new connection
 		// this is a json object because I may want to attach additional information in the future like a username
@@ -158,12 +160,13 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 
 void StreamSock::handleConnectionClosed(const WebSocketConnectionPtr& wsConnPtr) {
 	std::string uuid = wsConnPtr->getContext<SocketInfo>()->getUuid();
+	const std::string leave_msg = leaveMsg(uuid);
 
 	participants_mutex.lock();
 	participants.erase(wsConnPtr);
 
 	for (auto i : participants) {
-		i->send(leaveMsg(uuid));
+		i->send(leave_msg);
 	}
 
 #ifdef USE_LUA_PLUGINS
