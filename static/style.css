@@ -4,3 +4,10 @@
 		color: white;
 	}
 }
+
+.dynamic-grid {
+	display: grid;
+
+	/*they call me the CSS expert*/
+	grid-template-columns: repeat(clamp(1, var(--childCount, 1), 2), 1fr);
+}
