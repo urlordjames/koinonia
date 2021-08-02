@@ -70,10 +70,6 @@ fetch("/rtc_config.txt").then(function (resp) {
 	});
 });
 
-function update_participant_div() {
-	participant_div.style.setProperty("--childCount", participant_div.childElementCount);
-}
-
 // for handling autoplay
 let added_button = false;
 let blocked_tracks = [];
@@ -125,7 +121,6 @@ function get_participant(peer_uuid) {
 			track_element.srcObject = remoteStream;
 			track_element.style = "width: 100%";
 			participant_div.appendChild(track_element);
-			update_participant_div();
 
 			track_element.play().catch(function(error) {
 				if (error.name === "NotAllowedError") {
@@ -159,7 +154,6 @@ function get_participant(peer_uuid) {
 
 			e.track.onended = function() {
 				track_element.remove();
-				update_participant_div();
 			}
 		}
 
