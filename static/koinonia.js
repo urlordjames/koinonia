@@ -26,6 +26,8 @@ function add_tracks(tracks) {
 			const pc = participant["pc"];
 			pc.addTrack(track);
 		}
+
+		play_track(track);
 	}
 }
 
