@@ -14,7 +14,7 @@ let participants = {}
 let uuid;
 let local_streams = new Set();
 
-function add_tracks(tracks) {
+function add_tracks(tracks, flip) {
 	for (track of tracks) {
 		local_streams.add(track);
 
@@ -27,7 +27,7 @@ function add_tracks(tracks) {
 			pc.addTrack(track);
 		}
 
-		play_track(track);
+		play_track(track, flip);
 	}
 }
 
@@ -38,7 +38,7 @@ screenshare_button.addEventListener("click", function(e) {
 		// see https://caniuse.com/mdn-api_mediadevices_getdisplaymedia_audio-capture-support
 		"audio": true
 	}).then(function (localStream) {
-		add_tracks(localStream.getTracks());
+		add_tracks(localStream.getTracks(), false);
 	});
 });
 
@@ -46,7 +46,7 @@ camera_button.addEventListener("click", function(e) {
 	navigator.mediaDevices.getUserMedia({
 		"video": {"facingMode": "user"}
 	}).then(function(localStream) {
-		add_tracks(localStream.getTracks());
+		add_tracks(localStream.getTracks(), true);
 	});
 });
 
@@ -76,14 +76,20 @@ fetch("/rtc_config.txt").then(function (resp) {
 let added_button = false;
 let blocked_tracks = [];
 
-function play_track(track) {
+function play_track(track, flip) {
 	const track_element = document.createElement(track.kind);
 
 	const remoteStream = new MediaStream();
 	remoteStream.addTrack(track);
 
 	track_element.srcObject = remoteStream;
-	track_element.style = "width: 100%";
+	track_element.style.width = "100%";
+
+	// people don't generally like seeing themselves not mirrored
+	if (flip) {
+		track_element.style.transform = "scale(-1, 1)";
+	}
+
 	participant_div.appendChild(track_element);
 
 	track_element.play().catch(function(error) {
@@ -160,7 +166,7 @@ function get_participant(peer_uuid) {
 		}
 
 		pc.ontrack = function(e) {
-			play_track(e.track);
+			play_track(e.track, false);
 		}
 
 		for (track of local_streams) {
