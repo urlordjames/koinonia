@@ -16,10 +16,8 @@ services:
     command: "-n --max-port=49160 -a -r koinonia -v -f -u koinonia:koinonia -X $$(detect-external-ip)"
 
   nginx_proxy:
-    image: nginx:latest
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./static:/etc/static
+    image: "koinonia-proxy"
+    build: ./nginx
     ports:
       - 8080:80
     depends_on:
