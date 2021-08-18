@@ -70,12 +70,14 @@ else()
 	target_link_libraries(${PROJECT_NAME} PRIVATE drogon)
 endif()
 
+SET(STATIC_PATH "nginx/static" CACHE PATH "directory to copy static files from")
+
 # copy static files
-if(EXISTS "${CMAKE_SOURCE_DIR}/static")
-	file(COPY "static" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+if(EXISTS "${CMAKE_SOURCE_DIR}/${STATIC_PATH}")
+	file(COPY ${STATIC_PATH} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 else()
 	message(WARNING "static directory does not exist, will not attempt to copy")
 endif()
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
-install(DIRECTORY "static" DESTINATION extras)
+install(DIRECTORY ${STATIC_PATH} DESTINATION extras)
