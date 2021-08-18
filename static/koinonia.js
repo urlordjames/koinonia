@@ -27,7 +27,10 @@ function add_tracks(tracks, flip) {
 			pc.addTrack(track);
 		}
 
-		play_track(track, flip);
+		// don't play audio
+		if (track.kind === "video") {
+			play_track(track, flip);
+		}
 	}
 }
 
