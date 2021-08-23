@@ -15,7 +15,7 @@ RUN cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release && cmake --build . -j $(nproc)
 
 FROM alpine:latest
 
-RUN apk add --no-cache jsoncpp util-linux lua
+RUN apk add --no-cache jsoncpp libuuid lua
 RUN adduser koinonia -H -D && mkdir /koinonia && chown koinonia:koinonia /koinonia
 
 USER koinonia
