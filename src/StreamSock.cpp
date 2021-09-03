@@ -1,5 +1,4 @@
 #include "StreamSock.h"
-#include "SocketInfo.h"
 #include "Util.h"
 #include "Messages.h"
 
@@ -23,8 +22,7 @@ const std::unordered_map<std::string, msgType> typelookup = {
 #endif
 };
 
-std::unordered_set<WebSocketConnectionPtr> StreamSock::participants;
-std::mutex participants_mutex;
+std::unordered_map<int, Room> StreamSock::rooms;
 
 #ifdef USE_LUA_PLUGINS
 #include "PluginManager.h"
@@ -64,53 +62,40 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 			wsConnPtr->send(uuidMsg(info->getUuid()));
 			break;
 		case msgType::offer:
-			// TODO: maybe use std::map instead
-			participants_mutex.lock();
+			{
+				auto p = rooms[info->getRoom()].getParticipant(m["uuid"].asString());
 
-			for (auto i : participants) {
-				auto p = i->getContext<SocketInfo>();
-				if (p->getUuid() == m["uuid"].asString()) {
-					i->send(offerMsg(info->getUuid(), m["offer"]));
-					participants_mutex.unlock();
-					return;
+				if (p.has_value()) {
+					p.value()->send(offerMsg(info->getUuid(), m["offer"]));
+				} else {
+					wsConnPtr->send(errorMsg("no such uuid"));
 				}
 			}
 
-			participants_mutex.unlock();
-
-			wsConnPtr->send(errorMsg("no such uuid"));
 			break;
 		case msgType::answer:
-			participants_mutex.lock();
+			{
+				auto p = rooms[info->getRoom()].getParticipant(m["uuid"].asString());
 
-			for (auto i : participants) {
-				auto p = i->getContext<SocketInfo>();
-				if (p->getUuid() == m["uuid"].asString()) {
-					i->send(answerMsg(info->getUuid(), m["answer"]));
-					participants_mutex.unlock();
-					return;
+				if (p.has_value()) {
+					p.value()->send(answerMsg(info->getUuid(), m["answer"]));
+				} else {
+					wsConnPtr->send(errorMsg("no such uuid"));
 				}
 			}
 
-			participants_mutex.unlock();
-
-			wsConnPtr->send(errorMsg("no such uuid"));
 			break;
 		case msgType::ice:
-			participants_mutex.lock();
+			{
+				auto p = rooms[info->getRoom()].getParticipant(m["uuid"].asString());
 
-			for (auto i : participants) {
-				auto p = i->getContext<SocketInfo>();
-				if (p->getUuid() == m["uuid"].asString()) {
-					i->send(iceMsg(info->getUuid(), m["candidate"]));
-					participants_mutex.unlock();
-					return;
+				if (p.has_value()) {
+					p.value()->send(iceMsg(info->getUuid(), m["candidate"]));
+				} else {
+					wsConnPtr->send(errorMsg("no such uuid"));
 				}
 			}
 
-			participants_mutex.unlock();
-
-			wsConnPtr->send(errorMsg("no such uuid"));
 			break;
 #ifdef USE_LUA_PLUGINS
 		case msgType::plugin:
@@ -125,17 +110,14 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 }
 
 void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketConnectionPtr& wsConnPtr) {
-	auto info = std::make_shared<SocketInfo>();
-	info->setUuid(drogon::utils::getUuid());
+	auto info = std::make_shared<SocketInfo>(drogon::utils::getUuid(), 0);
 	wsConnPtr->setContext(info);
 
 	const std::string join_msg = joinMsg(info->getUuid());
 
 	Json::Value to_send(Json::arrayValue);
 
-	participants_mutex.lock();
-
-	for (auto i : participants) {
+	for (auto i : rooms[0].allParticipants()) {
 		// inform all participants of new participant
 		i->send(join_msg);
 
@@ -147,13 +129,13 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 		to_send.append(part_json);
 	}
 
-	participants.insert(wsConnPtr);
+	// TODO: investigate potential race condition here
+
+	rooms[0].join(info->getUuid(), wsConnPtr);
 
 #ifdef USE_LUA_PLUGINS
 	pluginManager.onJoin(info->getUuid());
 #endif
-
-	participants_mutex.unlock();
 
 	wsConnPtr->send(syncMsg(to_send));
 }
@@ -162,16 +144,15 @@ void StreamSock::handleConnectionClosed(const WebSocketConnectionPtr& wsConnPtr)
 	std::string uuid = wsConnPtr->getContext<SocketInfo>()->getUuid();
 	const std::string leave_msg = leaveMsg(uuid);
 
-	participants_mutex.lock();
-	participants.erase(wsConnPtr);
+	rooms[0].leave(uuid);
 
-	for (auto i : participants) {
+	// TODO: investigate potential race condition here
+
+	for (auto i : rooms[0].allParticipants()) {
 		i->send(leave_msg);
 	}
 
 #ifdef USE_LUA_PLUGINS
 	pluginManager.onLeave(uuid);
 #endif
-
-	participants_mutex.unlock();
 }

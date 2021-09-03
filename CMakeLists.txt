@@ -22,9 +22,11 @@ set(PROJECT_SOURCES
 	src/StreamSock.cpp
 	src/Util.cpp
 	src/Messages.cpp
+	src/Room.cpp
 )
 
-option(USE_LUA_PLUGINS "compile with Lua to allow for running user created plugins" ON)
+# currently in limbo
+option(USE_LUA_PLUGINS "compile with Lua to allow for running user created plugins" OFF)
 
 if(USE_LUA_PLUGINS)
 	list(APPEND PROJECT_SOURCES
