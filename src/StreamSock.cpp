@@ -117,7 +117,7 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 
 	Json::Value to_send(Json::arrayValue);
 
-	for (auto i : rooms[0].allParticipants()) {
+	for (auto i : rooms[info->getRoom()].allParticipants()) {
 		// inform all participants of new participant
 		i->send(join_msg);
 
@@ -131,7 +131,7 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 
 	// TODO: investigate potential race condition here
 
-	rooms[0].join(info->getUuid(), wsConnPtr);
+	rooms[info->getRoom()].join(info->getUuid(), wsConnPtr);
 
 #ifdef USE_LUA_PLUGINS
 	pluginManager.onJoin(info->getUuid());
@@ -141,14 +141,15 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 }
 
 void StreamSock::handleConnectionClosed(const WebSocketConnectionPtr& wsConnPtr) {
-	std::string uuid = wsConnPtr->getContext<SocketInfo>()->getUuid();
+	auto info = wsConnPtr->getContext<SocketInfo>();
+	std::string uuid = info->getUuid();
 	const std::string leave_msg = leaveMsg(uuid);
 
-	rooms[0].leave(uuid);
+	rooms[info->getRoom()].leave(uuid);
 
 	// TODO: investigate potential race condition here
 
-	for (auto i : rooms[0].allParticipants()) {
+	for (auto i : rooms[info->getRoom()].allParticipants()) {
 		i->send(leave_msg);
 	}
 
