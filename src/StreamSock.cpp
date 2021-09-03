@@ -105,19 +105,27 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 			break;
 #endif
 		default:
-			wsConnPtr->send(debugMsg("no server implementation for message type: " + typestring));
+			wsConnPtr->send(errorMsg("no server implementation for message type: " + typestring));
 	}
 }
 
 void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketConnectionPtr& wsConnPtr) {
-	auto info = std::make_shared<SocketInfo>(drogon::utils::getUuid(), 0);
+	int room_id = 0;
+
+	try{
+		room_id = std::stoi(req->getParameter("id"));
+	} catch (std::exception) {
+		wsConnPtr->send(errorMsg("invalid room id, defaulting to 0"));
+	}
+
+	auto info = std::make_shared<SocketInfo>(drogon::utils::getUuid(), room_id);
 	wsConnPtr->setContext(info);
 
 	const std::string join_msg = joinMsg(info->getUuid());
 
 	Json::Value to_send(Json::arrayValue);
 
-	for (auto i : rooms[info->getRoom()].allParticipants()) {
+	for (auto i : rooms[room_id].allParticipants()) {
 		// inform all participants of new participant
 		i->send(join_msg);
 
@@ -131,7 +139,7 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 
 	// TODO: investigate potential race condition here
 
-	rooms[info->getRoom()].join(info->getUuid(), wsConnPtr);
+	rooms[room_id].join(info->getUuid(), wsConnPtr);
 
 #ifdef USE_LUA_PLUGINS
 	pluginManager.onJoin(info->getUuid());

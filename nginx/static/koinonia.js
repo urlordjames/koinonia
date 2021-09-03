@@ -1,6 +1,6 @@
 const url = new URL(window.location.href);
 const ws_prefix = (url.protocol == "https:") ? "wss://" : "ws://";
-const ws = new WebSocket(ws_prefix + url.hostname + ":" + url.port + "/stream");
+const ws = new WebSocket(ws_prefix + url.hostname + ":" + url.port + "/stream?id=" + prompt("bruh"));
 
 const screenshare_button = document.getElementById("screenshare_button");
 const camera_button = document.getElementById("camera_button");
