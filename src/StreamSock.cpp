@@ -2,26 +2,6 @@
 #include "Util.h"
 #include "Messages.h"
 
-enum class msgType {
-	uuid,
-	offer,
-	answer,
-	ice,
-#ifdef USE_LUA_PLUGINS
-	plugin,
-#endif
-};
-
-const std::unordered_map<std::string, msgType> typelookup = {
-	{"uuid", msgType::uuid},
-	{"offer", msgType::offer},
-	{"answer", msgType::answer},
-	{"ice", msgType::ice},
-#ifdef USE_LUA_PLUGINS
-	{"plugin", msgType::plugin},
-#endif
-};
-
 std::unordered_map<int, Room> StreamSock::rooms;
 
 #ifdef USE_LUA_PLUGINS
@@ -35,84 +15,63 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 	Json::Value m;
 	try {
 		m = parseJSON(message);
-	} catch (std::string err) {
+	} catch (JSONCPP_STRING err) {
 		wsConnPtr->send(errorMsg(err));
 		return;
 	}
 
-	std::string typestring;
+	std::string msgType;
 	try {
-		typestring = m["type"].asString();
+		msgType = m["type"].asString();
 	} catch (Json::Exception err) {
 		wsConnPtr->send(errorMsg(err.what()));
 		return;
 	}
 
-	msgType msgtype;
-	try {
-		msgtype = typelookup.at(typestring);
-	} catch (std::out_of_range err) {
-		wsConnPtr->send(errorMsg("no such message type: " + typestring));
-		return;
-	}
-
 	auto info = wsConnPtr->getContext<SocketInfo>();
-	switch (msgtype) {
-		case msgType::uuid:
+	if (msgType == "uuid") {
 			wsConnPtr->send(uuidMsg(info->getUuid()));
-			break;
-		case msgType::offer:
-			{
-				auto p = rooms[info->getRoom()].getParticipant(m["uuid"].asString());
+	} else if (msgType == "offer") {
+		auto p = rooms[info->getRoom()].getParticipant(m["uuid"].asString());
 
-				if (p.has_value()) {
-					p.value()->send(offerMsg(info->getUuid(), m["offer"]));
-				} else {
-					wsConnPtr->send(errorMsg("no such uuid"));
-				}
-			}
+		if (p.has_value()) {
+			p.value()->send(offerMsg(info->getUuid(), m["offer"]));
+		} else {
+			wsConnPtr->send(errorMsg("no such uuid"));
+		}
+	} else if (msgType == "answer") {
+		auto p = rooms[info->getRoom()].getParticipant(m["uuid"].asString());
 
-			break;
-		case msgType::answer:
-			{
-				auto p = rooms[info->getRoom()].getParticipant(m["uuid"].asString());
+		if (p.has_value()) {
+			p.value()->send(answerMsg(info->getUuid(), m["answer"]));
+		} else {
+			wsConnPtr->send(errorMsg("no such uuid"));
+		}
+	} else if (msgType == "ice") {
+		auto p = rooms[info->getRoom()].getParticipant(m["uuid"].asString());
 
-				if (p.has_value()) {
-					p.value()->send(answerMsg(info->getUuid(), m["answer"]));
-				} else {
-					wsConnPtr->send(errorMsg("no such uuid"));
-				}
-			}
-
-			break;
-		case msgType::ice:
-			{
-				auto p = rooms[info->getRoom()].getParticipant(m["uuid"].asString());
-
-				if (p.has_value()) {
-					p.value()->send(iceMsg(info->getUuid(), m["candidate"]));
-				} else {
-					wsConnPtr->send(errorMsg("no such uuid"));
-				}
-			}
-
-			break;
+		if (p.has_value()) {
+			p.value()->send(iceMsg(info->getUuid(), m["candidate"]));
+		} else {
+			wsConnPtr->send(errorMsg("no such uuid"));
+		}
+	}
 #ifdef USE_LUA_PLUGINS
-		case msgType::plugin:
-			participants_mutex.lock();
-			pluginManager.passMsg(m["id"].asInt(), info->getUuid(), m["msg"].asString());
-			participants_mutex.unlock();
-			break;
+	else if (msgType == "plugin") {
+		participants_mutex.lock();
+		pluginManager.passMsg(m["id"].asInt(), info->getUuid(), m["msg"].asString());
+		participants_mutex.unlock();
+	}
 #endif
-		default:
-			wsConnPtr->send(errorMsg("no server implementation for message type: " + typestring));
+	else {
+			wsConnPtr->send(errorMsg("no server implementation for message type: " + msgType));
 	}
 }
 
 void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketConnectionPtr& wsConnPtr) {
 	int room_id = 0;
 
-	try{
+	try {
 		room_id = std::stoi(req->getParameter("id"));
 	} catch (std::exception) {
 		wsConnPtr->send(errorMsg("invalid room id, defaulting to 0"));
