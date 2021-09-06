@@ -3,23 +3,6 @@ name: "build"
 on: ["push", "pull_request"]
 
 jobs:
-  build-docker:
-    runs-on: "ubuntu-latest"
-
-    steps:
-    - uses: "actions/checkout@v2"
-
-    - name: "build"
-      run: "docker build -t koinonia ."
-
-    - name: "export"
-      run: "docker save koinonia > koinonia.tar"
-
-    - uses: "actions/upload-artifact@v2"
-      with:
-        name: "docker image"
-        path: "koinonia.tar"
-
   build-nix:
     runs-on: "ubuntu-latest"
     container: "nixos/nix"
