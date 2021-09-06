@@ -1,4 +1,4 @@
-FROM alpine:latest as drogon-builder
+FROM alpine:latest
 
 RUN mkdir -p /compile/build
 WORKDIR /compile
@@ -21,7 +21,7 @@ RUN adduser koinonia -H -D && mkdir /koinonia && chown koinonia:koinonia /koinon
 USER koinonia
 WORKDIR /koinonia
 
-COPY --chown=koinonia:koinonia --from=drogon-builder /compile/build/koinonia /koinonia/koinonia
+COPY --chown=koinonia:koinonia --from=0 /compile/build/koinonia /koinonia/koinonia
 COPY --chown=koinonia:koinonia nginx/static /koinonia/static
 
 EXPOSE 8080
