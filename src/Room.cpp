@@ -1,4 +1,5 @@
 #include "Room.h"
+#include "Messages.h"
 
 std::optional<drogon::WebSocketConnectionPtr> Room::getParticipant(const std::string &uuid) {
 	std::lock_guard<std::mutex> lock(mutex);
@@ -31,9 +32,11 @@ void Room::join(std::string uuid, drogon::WebSocketConnectionPtr wsConnPtr) {
 void Room::leave(const std::string &uuid) {
 	std::lock_guard<std::mutex> lock(mutex);
 
+	const std::string leave_msg = leaveMsg(uuid);
+
 	participants.erase(uuid);
 
 	for (auto participant : participants) {
-		participant->send(leave_msg);
+		participant.second->send(leave_msg);
 	}
 }

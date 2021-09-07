@@ -111,7 +111,6 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 void StreamSock::handleConnectionClosed(const WebSocketConnectionPtr& wsConnPtr) {
 	auto info = wsConnPtr->getContext<SocketInfo>();
 	std::string uuid = info->getUuid();
-	const std::string leave_msg = leaveMsg(uuid);
 
 	rooms[info->getRoom()].leave(uuid);
 
