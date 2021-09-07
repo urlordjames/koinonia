@@ -1,7 +1,10 @@
 const url = new URL(window.location.href);
 const ws_prefix = (url.protocol == "https:") ? "wss://" : "ws://";
 
-const n_room = localStorage.getItem("room_id") || "0";
+const n_room = sessionStorage.getItem("room_id") || "0";
+const room_id_input = document.getElementById("room_id");
+room_id_input.value = n_room;
+
 const ws = new WebSocket(ws_prefix + url.hostname + ":" + url.port + "/stream?id=" + n_room);
 
 const screenshare_button = document.getElementById("screenshare_button");
@@ -12,7 +15,7 @@ camera_button.disabled = true;
 
 const room_button = document.getElementById("change_room_button");
 room_button.addEventListener("click", function (e) {
-	localStorage.setItem("room_id", document.getElementById("room_id").value);
+	sessionStorage.setItem("room_id", room_id_input.value);
 	location.reload();
 });
 
