@@ -2,7 +2,7 @@ name: "build"
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "static_ecr"]
 
 env:
   ECR_REPO: "public.ecr.aws/x9a4j9i2"
