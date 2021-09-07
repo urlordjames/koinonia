@@ -6,7 +6,6 @@ std::optional<drogon::WebSocketConnectionPtr> Room::getParticipant(const std::st
 	try {
 		return std::make_optional<drogon::WebSocketConnectionPtr>(participants.at(uuid));
 	} catch (std::out_of_range) {
-		//return std::make_optional<drogon::WebSocketConnectionPtr>(std::nullopt);
 		return std::nullopt;
 	};
 }
@@ -33,4 +32,8 @@ void Room::leave(const std::string &uuid) {
 	std::lock_guard<std::mutex> lock(mutex);
 
 	participants.erase(uuid);
+
+	for (auto participant : participants) {
+		participant->send(leave_msg);
+	}
 }

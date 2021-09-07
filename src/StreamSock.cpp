@@ -29,6 +29,7 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 	}
 
 	auto info = wsConnPtr->getContext<SocketInfo>();
+
 	if (msgType == "uuid") {
 			wsConnPtr->send(uuidMsg(info->getUuid()));
 	} else if (msgType == "offer") {
@@ -113,12 +114,6 @@ void StreamSock::handleConnectionClosed(const WebSocketConnectionPtr& wsConnPtr)
 	const std::string leave_msg = leaveMsg(uuid);
 
 	rooms[info->getRoom()].leave(uuid);
-
-	// TODO: investigate potential race condition here
-
-	for (auto i : rooms[info->getRoom()].allParticipants()) {
-		i->send(leave_msg);
-	}
 
 #ifdef USE_LUA_PLUGINS
 	pluginManager.onLeave(uuid);
