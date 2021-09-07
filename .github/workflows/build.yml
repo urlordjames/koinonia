@@ -22,7 +22,7 @@ jobs:
     steps:
     - uses: "actions/checkout@v2"
 
-    - name: "dependancies"
+    - name: "dependencies"
       run: "vcpkg install drogon:x64-windows lua:x64-windows && vcpkg integrate install && mkdir build"
 
     - name: "build"

@@ -1,12 +1,20 @@
 const url = new URL(window.location.href);
 const ws_prefix = (url.protocol == "https:") ? "wss://" : "ws://";
-const ws = new WebSocket(ws_prefix + url.hostname + ":" + url.port + "/stream?id=" + prompt("bruh"));
+
+const n_room = localStorage.getItem("room_id") || "0";
+const ws = new WebSocket(ws_prefix + url.hostname + ":" + url.port + "/stream?id=" + n_room);
 
 const screenshare_button = document.getElementById("screenshare_button");
 const camera_button = document.getElementById("camera_button");
 // on firefox even though the button is set to disabled in HTML, it becomes enabled again when you reload
 screenshare_button.disabled = true;
 camera_button.disabled = true;
+
+const room_button = document.getElementById("change_room_button");
+room_button.addEventListener("click", function (e) {
+	localStorage.setItem("room_id", document.getElementById("room_id").value);
+	location.reload();
+});
 
 const participant_div = document.getElementById("participant_div");
 
