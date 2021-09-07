@@ -4,12 +4,12 @@ on:
   push:
     branches: ["main"]
 
-jobs:
-  build-docker:
-    runs-on: "ubuntu-latest"
+env:
+  ECR_REPO: "public.ecr.aws/x9a4j9i2"
 
-    env:
-      ECR_REPO: "public.ecr.aws/x9a4j9i2"
+jobs:
+  build-app:
+    runs-on: "ubuntu-latest"
 
     steps:
     - name: "login to ECR"
@@ -34,3 +34,22 @@ jobs:
 
     - name: "push to ECR"
       run: "docker tag koinonia $ECR_REPO/koinonia:latest && docker push $ECR_REPO/koinonia:latest"
+
+  build-static:
+    runs-on: "ubuntu-latest"
+
+    steps:
+    - name: "login to ECR"
+      uses: "docker/login-action@v1"
+      with:
+        registry: "public.ecr.aws"
+        username: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    - uses: "actions/checkout@v2"
+
+    - name: "build"
+      run: "docker build -t $ECR_REPO/koinonia_static:latest"
+
+    - name: "push to ECR"
+      run: "docker push $ECR_REPO/koinonia_static:latest"
