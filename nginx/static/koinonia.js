@@ -62,18 +62,18 @@ ws.onclose = function() {
 	camera_button.disabled = true;
 }
 
-let rtc_config = {}
-
-fetch("/rtc_config.txt").then(function (resp) {
-	if (!resp.ok) {
-		console.error("failed to fetch rtc config");
-		return;
-	}
-
-	resp.json().then(function (json) {
-		rtc_config = json;
-	});
-});
+let rtc_config = {
+	"iceServers": [
+		{
+			"urls": ["stun:stun.l.google.com:19302"]
+		},
+		{
+			"urls": ["turn:" + url.hostname],
+			"username": "koinonia",
+			"credential": "koinonia"
+		}
+	]
+}
 
 // for handling autoplay
 let added_button = false;
