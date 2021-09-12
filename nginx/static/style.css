@@ -3,9 +3,21 @@
 		background-color: black;
 		color: white;
 	}
+
+	a {
+		color: grey;
+	}
 }
 
 .dynamic-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+}
+
+.info-bar {
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	text-align: center;
+	background-color: inherit;
 }
