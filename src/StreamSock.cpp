@@ -69,7 +69,7 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 	}
 }
 
-void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketConnectionPtr& wsConnPtr) {
+void StreamSock::handleNewConnection(const HttpRequestPtr &req, const WebSocketConnectionPtr& wsConnPtr) {
 	int room_id = 0;
 
 	try {
@@ -81,31 +81,7 @@ void StreamSock::handleNewConnection(const HttpRequestPtr &req,const WebSocketCo
 	auto info = std::make_shared<SocketInfo>(drogon::utils::getUuid(), room_id);
 	wsConnPtr->setContext(info);
 
-	const std::string join_msg = joinMsg(info->getUuid());
-
-	Json::Value to_send(Json::arrayValue);
-
-	for (auto i : rooms[room_id].allParticipants()) {
-		// inform all participants of new participant
-		i->send(join_msg);
-
-		// sync state with new connection
-		// this is a json object because I may want to attach additional information in the future like a username
-		auto p = i->getContext<SocketInfo>();
-		Json::Value part_json;
-		part_json["uuid"] = p->getUuid();
-		to_send.append(part_json);
-	}
-
-	// TODO: investigate potential race condition here
-
 	rooms[room_id].join(info->getUuid(), wsConnPtr);
-
-#ifdef USE_LUA_PLUGINS
-	pluginManager.onJoin(info->getUuid());
-#endif
-
-	wsConnPtr->send(syncMsg(to_send));
 }
 
 void StreamSock::handleConnectionClosed(const WebSocketConnectionPtr& wsConnPtr) {
