@@ -11,7 +11,7 @@ in pkgs.stdenv.mkDerivation rec {
 
 	buildInputs = with pkgs; [
 		drogon
-		lua
+		#lua
 	];
 
 	preConfigure = ''
