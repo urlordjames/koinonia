@@ -21,6 +21,10 @@ room_button.addEventListener("click", function (e) {
 
 const participant_div = document.getElementById("participant_div");
 
+if ("serviceWorker" in navigator) {
+	navigator.serviceWorker.register("/service-worker.js");
+}
+
 let participants = {}
 let uuid;
 let local_streams = new Set();
