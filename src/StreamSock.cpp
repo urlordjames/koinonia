@@ -31,7 +31,7 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 	auto info = wsConnPtr->getContext<SocketInfo>();
 
 	if (msgType == "uuid") {
-			wsConnPtr->send(uuidMsg(info->getUuid()));
+		wsConnPtr->send(uuidMsg(info->getUuid()));
 	} else if (msgType == "offer") {
 		auto p = rooms[info->getRoom()].getParticipant(m["uuid"].asString());
 
@@ -65,7 +65,7 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 	}
 #endif
 	else {
-			wsConnPtr->send(errorMsg("no server implementation for message type: " + msgType));
+		wsConnPtr->send(errorMsg("no server implementation for message type: " + msgType));
 	}
 }
 

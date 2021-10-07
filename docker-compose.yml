@@ -12,7 +12,6 @@ services:
       - 3478:3478/udp
       # max port is low because docker has serious performance issues with many ports
       - 49152-49160:49152-49160/udp
-    # TODO: maybe make password rotate every n minutes so this can't be easily exploited
     command: "-n --max-port=49160 -a -r koinonia -f -u koinonia:koinonia -X $$(detect-external-ip)"
 
   nginx_proxy:
