@@ -1,12 +1,11 @@
 FROM alpine:latest as static-builder
 
-RUN mkdir /static
 WORKDIR /static
 
-RUN apk add --no-cache npm python3 g++ make && npm install -g parcel
+RUN apk add --no-cache npm && npm install -g webpack-cli
 
-COPY static .
-RUN parcel build index.html && gzip dist/* -k
+COPY static static
+RUN cp static dist -r &&  webpack build ./static/koinonia.js && mv dist/main.js dist/koinonia.js && gzip dist/* -k
 
 FROM nginx:alpine
 

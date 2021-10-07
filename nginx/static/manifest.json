@@ -1,0 +1,8 @@
+{
+	"name": "koinonia",
+	"start_url": "/",
+	"display": "browser",
+	"dir": "ltr",
+	"orientation": "any",
+	"scope": "/"
+}
