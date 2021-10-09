@@ -24,7 +24,7 @@ room_button.addEventListener("click", function (e) {
 const participant_div = document.getElementById("participant_div");
 
 if ("serviceWorker" in navigator) {
-	navigator.serviceWorker.register("/service-worker.js");
+	navigator.serviceWorker.register("/sw.js");
 }
 
 let participants = {}

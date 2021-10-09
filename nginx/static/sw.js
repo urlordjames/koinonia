@@ -1,4 +1,3 @@
-// why do I need to do this myself?
 self.addEventListener("install", function(event) {
 	caches.open("koinonia-cache").then(function(cache) {
 		return cache.addAll([
@@ -9,8 +8,13 @@ self.addEventListener("install", function(event) {
 	});
 });
 
+// network first, fall back to cache
 self.addEventListener("fetch", function(event) {
-	event.respondWith(caches.match(event.request).then(function(response) {
-		return response || fetch(event.request);
+	event.respondWith(fetch(event.request).then(function(response) {
+		return response;
+	}).catch(function() {
+		return caches.match(event.request).then(function(response) {
+			return response;
+		});
 	}));
 });
