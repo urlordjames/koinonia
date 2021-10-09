@@ -1,9 +1,12 @@
+const cache_name = "koinonia-cache";
+
 self.addEventListener("install", function(event) {
-	caches.open("koinonia-cache").then(function(cache) {
+	caches.open(cache_name).then(function(cache) {
 		return cache.addAll([
 			"/",
-			"/style.css"
-			// probably not a good idea to cache koinonia.js yet
+			"/style.css",
+			"/koinonia.js",
+			"/manifest.json"
 		]);
 	});
 });
@@ -11,6 +14,9 @@ self.addEventListener("install", function(event) {
 // network first, fall back to cache
 self.addEventListener("fetch", function(event) {
 	event.respondWith(fetch(event.request).then(function(response) {
+		caches.open(cache_name).then(function(cache) {
+			cache.add(event.request);
+		});
 		return response;
 	}).catch(function() {
 		return caches.match(event.request).then(function(response) {
