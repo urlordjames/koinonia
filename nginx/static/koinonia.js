@@ -9,9 +9,11 @@ const ws = new WebSocket(ws_prefix + url.hostname + ":" + url.port + "/stream?id
 
 const screenshare_button = document.getElementById("screenshare_button");
 const camera_button = document.getElementById("camera_button");
+const mic_button = document.getElementById("mic_button");
 // on firefox even though the button is set to disabled in HTML, it becomes enabled again when you reload
 screenshare_button.disabled = true;
 camera_button.disabled = true;
+mic_button.disabled = true;
 
 const room_button = document.getElementById("change_room_button");
 room_button.addEventListener("click", function (e) {
@@ -63,6 +65,14 @@ screenshare_button.addEventListener("click", function(e) {
 camera_button.addEventListener("click", function(e) {
 	navigator.mediaDevices.getUserMedia({
 		"video": {"facingMode": "user"}
+	}).then(function(localStream) {
+		add_tracks(localStream.getTracks(), true);
+	});
+});
+
+mic_button.addEventListener("click", function(e) {
+	navigator.mediaDevices.getUserMedia({
+		"audio": true
 	}).then(function(localStream) {
 		add_tracks(localStream.getTracks(), true);
 	});
@@ -203,6 +213,7 @@ ws.onmessage = async function(e) {
 		uuid = msg.uuid;
 		screenshare_button.disabled = false;
 		camera_button.disabled = false;
+		mic_button.disabled = false;
 	} else if (msg["type"] == "sync") {
 		for (peer of msg.peers) {
 			// refresh local participant list
