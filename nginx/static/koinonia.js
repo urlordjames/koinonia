@@ -85,6 +85,7 @@ ws.onopen = async function() {
 ws.onclose = function() {
 	screenshare_button.disabled = true;
 	camera_button.disabled = true;
+	mic_button.disabled = true;
 }
 
 let rtc_config = {
