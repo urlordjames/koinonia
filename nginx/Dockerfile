@@ -5,7 +5,7 @@ WORKDIR /static
 RUN apk add --no-cache npm && npm install -g webpack-cli
 
 COPY static static
-RUN cp static dist -r &&  webpack build ./static/koinonia.js && mv dist/main.js dist/koinonia.js && cp dist/sw.js dist/service-worker.js gzip dist/* -k
+RUN cp static dist -r &&  webpack build ./static/koinonia.js && mv dist/main.js dist/koinonia.js && cp dist/sw.js dist/service-worker.js && gzip dist/* -k
 
 FROM nginx:alpine
 
