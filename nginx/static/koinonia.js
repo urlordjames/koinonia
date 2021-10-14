@@ -167,9 +167,7 @@ function get_participant(peer_uuid) {
 	if (!participants[peer_uuid]) {
 		const pc = new RTCPeerConnection(rtc_config);
 
-		let participant = participants[peer_uuid];
-
-		participant = {
+		let participant = {
 			"pc": pc,
 		};
 
