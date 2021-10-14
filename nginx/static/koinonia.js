@@ -1,4 +1,11 @@
 const url = new URL(window.location.href);
+
+const room_parameter = url.searchParams.get("room");
+if (room_parameter !== null) {
+	sessionStorage.setItem("room_id", room_parameter);
+	location = "/";
+}
+
 const ws_prefix = (url.protocol == "https:") ? "wss://" : "ws://";
 
 const n_room = sessionStorage.getItem("room_id") || "0";
