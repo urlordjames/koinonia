@@ -1,7 +1,7 @@
 {
 	"name": "koinonia",
 	"start_url": "/",
-	"display": "fullscreen",
+	"display": "standalone",
 	"icons": [
 		{
 			"src": "/logo.png",
