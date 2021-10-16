@@ -98,7 +98,7 @@ ws.onclose = function() {
 let rtc_config = {
 	"iceServers": [
 		{
-			"urls": ["stun:stun.l.google.com:19302"]
+			"urls": ["stun:" + url.hostname]
 		},
 		{
 			"urls": ["turn:" + url.hostname],
