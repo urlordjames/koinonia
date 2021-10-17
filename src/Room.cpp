@@ -11,18 +11,6 @@ std::optional<drogon::WebSocketConnectionPtr> Room::getParticipant(const std::st
 	};
 }
 
-std::unordered_set<drogon::WebSocketConnectionPtr> Room::allParticipants() {
-	std::unordered_set<drogon::WebSocketConnectionPtr> set;
-
-	std::lock_guard<std::mutex> lock(mutex);
-
-	for (auto participant : participants) {
-		set.insert(participant.second);
-	}
-
-	return set;
-}
-
 void Room::join(std::string uuid, drogon::WebSocketConnectionPtr wsConnPtr) {
 	const std::string join_msg = joinMsg(uuid);
 	Json::Value to_send(Json::arrayValue);
