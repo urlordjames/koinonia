@@ -12,7 +12,7 @@ if(NOT Drogon_FOUND)
 	include(FetchContent)
 	FetchContent_Declare(drogon_git
 		GIT_REPOSITORY "https://github.com/drogonframework/drogon.git"
-		GIT_TAG "v1.7.2"
+		GIT_TAG "v1.7.3"
 	)
 endif()
 
