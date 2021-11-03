@@ -3,14 +3,14 @@ FROM alpine:latest
 RUN mkdir -p /compile/build
 WORKDIR /compile
 
-RUN apk add --no-cache gcc g++ cmake ninja jsoncpp-dev zlib-dev git util-linux-dev
+RUN apk add --no-cache gcc g++ cmake make jsoncpp-dev zlib-dev git util-linux-dev
 
 COPY CMakeLists.txt .
 COPY src src
 
 WORKDIR /compile/build
 
-RUN cmake .. -GNinja -DCMAKE_BUILD_TYPE=Release && cmake --build . -j $(nproc)
+RUN cmake .. -DCMAKE_BUILD_TYPE=Release && cmake --build . -j $(nproc)
 
 FROM alpine:latest
 
