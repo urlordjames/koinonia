@@ -10,6 +10,9 @@ jobs:
     steps:
     - uses: "actions/checkout@v2"
 
+    - name: "add NixOS 21.11 channel"
+      run: "nix-channel --add https://nixos.org/channels/nixos-21.11 nixpkgs && nix-channel --update"
+
     - name: "build"
       run: "nix-build"
 
