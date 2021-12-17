@@ -7,6 +7,8 @@ int main() {
 	std::filesystem::path upload_path = std::filesystem::temp_directory_path() / "koinonia_uploads";
 	// explicit string conversion required, doesn't compile on Windows otherwise
 	drogon::app().setUploadPath(upload_path.string());
+	drogon::app().registerCustomExtensionMime("webmanifest", "application/manifest+json");
+	drogon::app().setFileTypes({"html", "css", "js", "svg", "webmanifest"});
 
 	drogon::app().addListener("0.0.0.0", 8080).run();
 }

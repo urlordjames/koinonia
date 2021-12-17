@@ -2,10 +2,10 @@ FROM alpine:latest as static-builder
 
 WORKDIR /static
 
-RUN apk add --no-cache npm && npm install -g webpack-cli
+RUN apk add --no-cache npm && npm install -g parcel
 
-COPY static static
-RUN cp static dist -r && webpack-cli build ./static/koinonia.js && mv dist/main.js dist/koinonia.js && cp dist/sw.js dist/service-worker.js && gzip dist/* -k
+COPY static .
+RUN parcel build index.html && gzip dist/* -k
 
 FROM nginx:alpine
 

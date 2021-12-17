@@ -31,7 +31,7 @@ room_button.addEventListener("click", function (e) {
 const participant_div = document.getElementById("participant_div");
 
 if ("serviceWorker" in navigator) {
-	navigator.serviceWorker.register("/sw.js");
+	navigator.serviceWorker.register(new URL("sw.js", import.meta.url));
 }
 
 let participants = {}
@@ -39,14 +39,14 @@ let uuid;
 let local_streams = new Set();
 
 function add_tracks(tracks, flip) {
-	for (track of tracks) {
+	for (const track of tracks) {
 		local_streams.add(track);
 
 		track.onended = function () {
 			local_streams.remove(track);
 		};
 
-		for (participant of Object.values(participants)) {
+		for (const participant of Object.values(participants)) {
 			const pc = participant["pc"];
 			pc.addTrack(track);
 		}
@@ -141,7 +141,7 @@ function play_track(track, flip) {
 				const play_button = document.createElement("button");
 				play_button.innerHTML = "click me to fix";
 				play_button.onclick = async function() {
-					for (track of blocked_tracks) {
+					for (const track of blocked_tracks) {
 						track.play();
 					}
 					blocked_tracks = null;
@@ -203,7 +203,7 @@ function get_participant(peer_uuid) {
 			play_track(e.track, false);
 		}
 
-		for (track of local_streams) {
+		for (const track of local_streams) {
 			pc.addTrack(track);
 		}
 
@@ -221,7 +221,7 @@ ws.onmessage = async function(e) {
 		camera_button.disabled = false;
 		mic_button.disabled = false;
 	} else if (msg["type"] == "sync") {
-		for (peer of msg.peers) {
+		for (const peer of msg.peers) {
 			// refresh local participant list
 			get_participant(peer.uuid);
 		}
