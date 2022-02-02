@@ -48,7 +48,7 @@ function add_tracks(tracks, flip) {
 
 		for (const participant of Object.values(participants)) {
 			const pc = participant["pc"];
-			pc.addTrack(track);
+			increase_quality(pc.addTrack(track));
 		}
 
 		// don't play audio
@@ -204,11 +204,21 @@ function get_participant(peer_uuid) {
 		}
 
 		for (const track of local_streams) {
-			pc.addTrack(track);
+			increase_quality(pc.addTrack(track));
 		}
 
 		return participant;
 	} else return participants[peer_uuid];
+}
+
+// it should work I think...
+function increase_quality(rtp_sender) {
+	setTimeout(function() {
+		let params = rtp_sender.getParameters();
+		let encoding = params.encodings[0];
+		encoding.maxBitrate = 8 * 1000 * 1000;
+		encoding.maxFramerate = 60;
+	}, 3000);
 }
 
 let plugin_callbacks = {};
