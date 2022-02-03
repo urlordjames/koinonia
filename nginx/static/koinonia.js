@@ -215,9 +215,12 @@ function get_participant(peer_uuid) {
 function increase_quality(rtp_sender) {
 	setTimeout(function() {
 		let params = rtp_sender.getParameters();
+
 		let encoding = params.encodings[0];
 		encoding.maxBitrate = 8 * 1000 * 1000;
 		encoding.maxFramerate = 60;
+
+		rtp_sender.setParameters(params);
 	}, 3000);
 }
 
