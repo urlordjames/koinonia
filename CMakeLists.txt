@@ -25,28 +25,12 @@ set(PROJECT_SOURCES
 	src/Room.cpp
 )
 
-# currently in limbo
-option(USE_LUA_PLUGINS "compile with Lua to allow for running user created plugins" OFF)
-
-if(USE_LUA_PLUGINS)
-	list(APPEND PROJECT_SOURCES
-		src/Plugin.cpp
-		src/PluginManager.cpp
-	)
-endif()
-
 add_executable(${PROJECT_NAME}
 	${PROJECT_SOURCES}
 )
 
 set(STATIC_ROOT "static" CACHE PATH "directory to serve static files from")
 target_compile_definitions(${PROJECT_NAME} PRIVATE STATIC_ROOT="${STATIC_ROOT}")
-
-if(USE_LUA_PLUGINS)
-	find_package(Lua REQUIRED)
-	target_link_libraries(${PROJECT_NAME} PRIVATE ${LUA_LIBRARIES})
-	target_compile_definitions(${PROJECT_NAME} PRIVATE "USE_LUA_PLUGINS")
-endif()
 
 if(NOT Drogon_FOUND)
 	# disable unused drogon stuff if building from source

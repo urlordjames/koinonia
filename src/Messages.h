@@ -14,7 +14,3 @@ std::string leaveMsg(const std::string &uuid);
 std::string offerMsg(const std::string &uuid, const Json::Value &offer);
 std::string answerMsg(const std::string &uuid, const Json::Value &answer);
 std::string iceMsg(const std::string &uuid, const Json::Value &candidate);
-
-// for plugins to pass custom messages
-std::string pluginMsg(int id, const std::string &message);
-std::string moduleMsg(const std::string &script);

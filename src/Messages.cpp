@@ -72,20 +72,3 @@ std::string iceMsg(const std::string &uuid, const Json::Value &candidate) {
 	msg["candidate"] = candidate;
 	return stringify(msg);
 }
-
-// plugins
-
-std::string pluginMsg(int id, const std::string &message) {
-	Json::Value msg;
-	msg["type"] = "plugin";
-	msg["id"] = id;
-	msg["msg"] = message;
-	return stringify(msg);
-}
-
-std::string moduleMsg(const std::string &script) {
-	Json::Value msg;
-	msg["type"] = "module";
-	msg["script"] = script;
-	return stringify(msg);
-}

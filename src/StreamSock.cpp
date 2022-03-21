@@ -4,11 +4,6 @@
 
 std::unordered_map<int, Room> StreamSock::rooms;
 
-#ifdef USE_LUA_PLUGINS
-#include "PluginManager.h"
-KPluginManager pluginManager("plugins");
-#endif
-
 void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::string&& message, const WebSocketMessageType& type) {
 	if (type != WebSocketMessageType::Text) return;
 
@@ -57,13 +52,6 @@ void StreamSock::handleNewMessage(const WebSocketConnectionPtr& wsConnPtr, std::
 			wsConnPtr->send(errorMsg("no such uuid"));
 		}
 	}
-#ifdef USE_LUA_PLUGINS
-	else if (msgType == "plugin") {
-		participants_mutex.lock();
-		pluginManager.passMsg(m["id"].asInt(), info->getUuid(), m["msg"].asString());
-		participants_mutex.unlock();
-	}
-#endif
 	else {
 		wsConnPtr->send(errorMsg("no server implementation for message type: " + msgType));
 	}
@@ -89,8 +77,4 @@ void StreamSock::handleConnectionClosed(const WebSocketConnectionPtr& wsConnPtr)
 	std::string uuid = info->getUuid();
 
 	rooms[info->getRoom()].leave(uuid);
-
-#ifdef USE_LUA_PLUGINS
-	pluginManager.onLeave(uuid);
-#endif
 }

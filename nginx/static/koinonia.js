@@ -224,8 +224,6 @@ function increase_quality(rtp_sender) {
 	}, 3000);
 }
 
-let plugin_callbacks = {};
-
 ws.onmessage = async function(e) {
 	const msg = JSON.parse(e.data);
 	if (msg["type"] == "uuid") {
@@ -271,11 +269,6 @@ ws.onmessage = async function(e) {
 		const part = participants[msg["uuid"]]
 		if (part) {
 			part["pc"].close()
-			delete participants[msg["uuid"]];
 		}
-	} else if (msg["type"] == "module") {
-		new Function(msg["script"])();
-	} else if (msg["type"] == "plugin") {
-		plugin_callbacks[msg["id"]](msg["msg"]);
 	}
 }
