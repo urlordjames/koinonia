@@ -1,4 +1,4 @@
-let pkgs = import <unstable> {};
+let pkgs = import <nixpkgs> {};
 in pkgs.stdenv.mkDerivation rec {
 	pname = "koinonia";
 	version = "0.1.0";
